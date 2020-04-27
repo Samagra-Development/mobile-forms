@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "567900180301",
+    "firebase_url": "https://samagra-data-management.firebaseio.com",
+    "project_id": "samagra-data-management",
+    "storage_bucket": "samagra-data-management.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567900180301:android:0ace738f7e212c607b3104",
+        "android_client_info": {
+          "package_name": "com.samagra.demo.samiksha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "567900180301-fijpoem62h8m7dh5s4iua34t911qof6j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCjX5KzmohbPNWIbbuFsFO0vwZA2sarjs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "567900180301-fijpoem62h8m7dh5s4iua34t911qof6j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

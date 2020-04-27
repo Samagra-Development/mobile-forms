@@ -1,0 +1,68 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.jakewharton.butterknife'
+
+android {
+    compileSdkVersion 28
+
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+        android.defaultConfig.vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    implementation files('libs/YouTubeAndroidPlayerApi.jar')
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(":commons")
+    implementation project(":collect_app")
+
+    //Dependency Injection (Cant be shared across modules)
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    annotationProcessor "com.google.dagger:dagger-compiler:2.19"
+
+    //Butterknife annotation processor cannot be shared across modules
+    annotationProcessor "com.jakewharton:butterknife-compiler:10.1.0"
+    compileOnly 'javax.annotation:jsr250-api:1.0'
+
+    // dependencies for local unit testing
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-core:2.23.4"
+    testImplementation 'org.mockito:mockito-inline:2.13.0' // for mocking final classes
+
+    // dependecies for Android testing/UI Testing/ Integration Tests
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    compile "androidx.core:core-ktx:+"
+    compile "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-alpha02"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
+}

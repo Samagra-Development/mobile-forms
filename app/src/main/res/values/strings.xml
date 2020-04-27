@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name" translatable="false">Samagra Form Manager</string>
+    <string name="view_issues" translatable="false">View Submitted Forms</string>
+    <string name="download_odk_forms">Download ODK Forms</string>
+</resources>

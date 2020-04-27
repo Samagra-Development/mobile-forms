@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="0dp"
+    android:layout_marginTop="0dp"
+    android:layout_marginRight="0dp"
+    android:layout_marginBottom="0dp"
+    android:orientation="vertical"
+    android:padding="0dp">
+
+    <include layout="@layout/toolbar" />
+
+    <include
+        layout="@layout/toolbar_action_bar_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar" />
+
+    <Button
+        android:id="@+id/download_odk_forms"
+        android:layout_width="240dp"
+        android:layout_height="64dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/white"
+        android:text="@string/download_odk_forms"
+        android:background="@color/button_colors"/>
+
+    <ProgressBar
+        android:id="@+id/circularProgressBar"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_below="@id/download_odk_forms"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:layout_gravity="center"
+        android:outlineAmbientShadowColor="@color/button_colors"
+        android:outlineSpotShadowColor="@color/button_colors"
+        android:visibility="gone"/>
+
+
+    <Button
+        android:id="@+id/show_odk_forms"
+        android:layout_width="240dp"
+        android:layout_height="64dp"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="26dp"
+        android:layout_below="@id/download_odk_forms"
+        android:textColor="@color/white"
+        android:text="View ODK Forms"
+        android:background="@color/button_colors"/>
+
+
+    <Button
+        android:id="@+id/show_specific_odk_forms"
+        android:layout_width="240dp"
+        android:layout_height="64dp"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="26dp"
+        android:layout_below="@id/show_odk_forms"
+        android:textColor="@color/white"
+        android:text="View Specific ODK Form"
+        android:background="@color/button_colors"/>
+
+</RelativeLayout>

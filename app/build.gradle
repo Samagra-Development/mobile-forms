@@ -1,0 +1,80 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+/*apply plugin: 'io.fabric'*/
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        vectorDrawables.useSupportLibrary = true
+        // Testing
+        applicationId "com.samagra.demo.samiksha"
+// applicationId"org.odk.collect.android.shikshaSathi"
+        // For Play store
+
+        // applicationId "com.samagra.shikshaSaathi"
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
+        testInstrumentationRunner('androidx.test.runner.AndroidJUnitRunner')
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+        incremental true
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(":collect_app")
+    implementation project(":commons")
+    implementation project(":ancillaryscreens")
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    // Firebase
+    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
+    implementation 'com.google.firebase:firebase-database:19.1.0'
+    implementation "com.google.firebase:firebase-auth:19.1.0"
+    implementation "com.google.firebase:firebase-storage:19.1.0"
+    implementation 'com.google.firebase:firebase-config:19.0.2'
+
+    // For forced update
+    implementation 'com.google.android.play:core:1.6.4'
+
+    // Keyboard visibility listeners
+    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0'
+
+    // Fuzzy search backend
+    implementation 'me.xdrop:fuzzywuzzy:1.2.0'
+
+    //Dependency Injection (Cant be shared across modules)
+    annotationProcessor "com.google.dagger:dagger-compiler:2.19"
+    compileOnly 'javax.annotation:jsr250-api:1.0'
+
+    // Butterknife
+    annotationProcessor "com.jakewharton:butterknife-compiler:10.1.0"
+
+    // GSON
+    implementation("com.google.code.gson:gson:2.6.2") {
+        exclude group: 'org.apache.httpcomponents'
+    }
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation("androidx.test:runner:1.2.0-alpha03") {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    }
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}
