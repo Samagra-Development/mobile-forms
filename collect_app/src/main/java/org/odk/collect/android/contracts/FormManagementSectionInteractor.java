@@ -111,21 +111,6 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
     }
 
     public void startGetFormListCall() {
-//        WebCalls.GetFormsListCall(getMvpView().getActivityContext(),
-//                "http://142.93.208.135:8080/shiksha-saathi/get-formlist-for-role", new RxEvents() {
-//                    @Override
-//                    public void onComplete() {
-//                        boolean firstRun = getMvpInteractor().isFirstRun();
-//                        if (true/*sharedPreferences.getBoolean("isLoggedIn", false)*/) {
-//                            // TODO: Implement Login logic and perform asctions based on that.
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Timber.e("On Error: Could not update the form list %s", e.getMessage());
-//                    }
-//                });
     }
 
 

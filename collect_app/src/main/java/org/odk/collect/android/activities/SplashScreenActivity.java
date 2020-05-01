@@ -235,21 +235,6 @@ public class SplashScreenActivity extends Activity {
     }
 
     private void startGetFormListCall() {
-        WebCalls.GetFormsListCall(this,
-                "http://142.93.208.135:8080/shiksha-saathi/get-formlist-for-role", new RxEvents() {
-                    @Override
-                    public void onComplete() {
-                        boolean firstRun = sharedPreferences.getBoolean(GeneralKeys.KEY_FIRST_RUN, true);
-                        if (sharedPreferences.getBoolean("isLoggedIn", false)) {
-                            // TODO: Implement Login logic and perform asctions based on that.
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e("On Error: Could not update the form list %s", e.getMessage());
-                    }
-                });
     }
 
     private void startUnzipTask() {
