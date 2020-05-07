@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
+import com.google.gson.JsonArray;
 import com.samagra.commons.Constants;
 import com.samagra.commons.MainApplication;
 
@@ -40,7 +42,10 @@ import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,9 +56,11 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -64,6 +71,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 import timber.log.Timber;
 
 import static org.odk.collect.android.utilities.EncryptionUtils.UTF_8;
@@ -121,12 +130,12 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
 
     @Override
     public void resetODKForms(Context context) {
-            final List<Integer> resetActions = new ArrayList<>();
-            resetActions.add(ResetUtility.ResetAction.RESET_FORMS);
-            if (!resetActions.isEmpty()) {
-                Runnable runnable = () -> new ResetUtility().reset(context, resetActions);
-                new Thread(runnable).start();
-            }
+        final List<Integer> resetActions = new ArrayList<>();
+        resetActions.add(ResetUtility.ResetAction.RESET_FORMS);
+        if (!resetActions.isEmpty()) {
+            Runnable runnable = () -> new ResetUtility().reset(context, resetActions);
+            new Thread(runnable).start();
+        }
     }
 
     @Override
@@ -232,7 +241,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
 
 
     @Override
-    public void updateFormBasedOnIdentifier(String formIdentifier, String tag, String tagValue){
+    public void updateFormBasedOnIdentifier(String formIdentifier, String tag, String tagValue) {
         int id = fetchSpecificFormID(formIdentifier);
         Uri formUri = ContentUris.withAppendedId(FormsProviderAPI.FormsColumns.CONTENT_URI, id);
         String fileName = ContentResolverHelper.getFormPath(formUri);
@@ -275,25 +284,25 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
     @Override
     public void launchViewUnsubmittedFormView(Context context, String className) {
 
-        if (Collect.allowClick(className)){
+        if (Collect.allowClick(className)) {
             Intent i = new Intent(context, InstanceUploaderListActivity.class);
             context.startActivity(i);
         }
     }
+
     @Override
-    public int fetchSpecificFormID(String formIdentifier){
+    public int fetchSpecificFormID(String formIdentifier) {
         List<Form> formsFromDB = getDownloadedFormsNamesFromDatabase();
         HashMap<Integer, String> hashMap = new HashMap<>();
-        for(int i = 0 ; i< formsFromDB.size(); i++){
+        for (int i = 0; i < formsFromDB.size(); i++) {
             hashMap.put(formsFromDB.get(i).getId(), formsFromDB.get(i).getDisplayName());
         }
-        for(Map.Entry<Integer, String> entry : hashMap.entrySet()) {
-            if(entry.getValue().contains(formIdentifier))
+        for (Map.Entry<Integer, String> entry : hashMap.entrySet()) {
+            if (entry.getValue().contains(formIdentifier))
                 return entry.getKey();
         }
         return 1;
     }
-
 
 
     private boolean shouldUpdate() {
@@ -305,9 +314,10 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
         Cursor cursor = fd.getFormsCursor();
         return fd.getFormsFromCursor(cursor);
     }
+
     @Override
     public boolean checkIfODKFormsMatch(String formsString) {
-        HashMap<String, String> formsListToBeDownloaded = downloadFormList( formsString);
+        HashMap<String, String> formsListToBeDownloaded = downloadFormList(formsString);
         Timber.e("formsListToBeDownloaded: " + formsListToBeDownloaded.size() + " FormsFromDatabase: " + getDownloadedFormsNamesFromDatabase().size());
         return getDownloadedFormsNamesFromDatabase().size() == formsListToBeDownloaded.size() && getDownloadedFormsNamesFromDatabase().size() != 0;
     }
@@ -316,13 +326,13 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
     public void startDownloadODKFormListTask(FormListDownloadResultCallback formListDownloadResultCallback) {
         DownloadFormListTask downloadFormListTask = new DownloadFormListTask(ODKDriver.getDownloadFormListUtils());
         downloadFormListTask.setDownloaderListener(value -> {
-            if(value != null && !value.containsKey("dlerrormessage")){
-                formListDownloadResultCallback.onSuccessfulFormListDownload(value);}
-            else {
+            if (value != null && !value.containsKey("dlerrormessage")) {
+                formListDownloadResultCallback.onSuccessfulFormListDownload(value);
+            } else {
                 assert value != null;
                 if (value.containsKey("dlerrormessage")) {
                     formListDownloadResultCallback.onFailureFormListDownload(true);
-                }else{
+                } else {
                     formListDownloadResultCallback.onFailureFormListDownload(false);
                 }
             }
@@ -333,7 +343,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
     @Override
     public HashMap<String, String> downloadNewFormsBasedOnDownloadedFormList(HashMap<String, String> userRoleBasedForms, HashMap<String, FormDetails> latestFormListFromServer) {
         HashMap<String, String> formsToBeDownloaded = new HashMap<>();
-        List<Form>  formsFromDB = getDownloadedFormsNamesFromDatabase();
+        List<Form> formsFromDB = getDownloadedFormsNamesFromDatabase();
         Iterator it = latestFormListFromServer.entrySet().iterator();
 
         // Delete excess forms
@@ -373,7 +383,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
         if (formsToBeDeleted.size() > 0 && formsToBeDeleted.toArray() != null) {
             new FormsDao().deleteFormsFromMd5Hash(formsToBeDeleted.toArray(new String[0]));
         }
-       return formsToBeDownloaded;
+        return formsToBeDownloaded;
     }
 
     @Override
@@ -387,8 +397,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
             String formID = pair.getKey().toString();
             String fileName = Collect.FORMS_PATH + File.separator + formName + ".xml";
             String serverURL = new WebCredentialsUtils().getServerUrlFromPreferences();
-            String partURL = "/www/formXml?formId=";
-            String downloadUrl = serverURL + partURL + formID;
+            String downloadUrl = serverURL + "/forms/" + formID + ".xml";
             FormDetails fm = new FormDetails(
                     formName,
                     downloadUrl,
@@ -398,7 +407,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
                     null,
                     null,
                     false,
-                    false);
+                    true);
             filesToDownload.add(fm);
             it.remove();
         }
@@ -406,7 +415,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
         downloadFormsTask.setDownloaderListener(new DownloadFormsTaskListener() {
             @Override
             public void formsDownloadingComplete(HashMap<FormDetails, String> result) {
-                if(result != null)
+                if (result != null)
                     dataFormDownloadResultCallback.formsDownloadingSuccessful(result);
                 else
                     dataFormDownloadResultCallback.formsDownloadingFailure();
@@ -427,4 +436,240 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
         downloadFormsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, filesToDownload);
     }
 
+
+    @Override
+    public ArrayList<ArrayList<String>> readDownloadedFormReferenceCSV(Context context) {
+        ArrayList<ArrayList<String>> result = new ArrayList<>();
+        try {
+            CSVReader reader = new CSVReader(new InputStreamReader(context.getResources().openRawResource(R.raw.sample)));//Specify asset file name
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                result.add(new ArrayList<>(Arrays.asList(nextLine)));
+                // nextLine[] is an array of values from the line
+//                Timber.d("The line is  " + nextLine.length + "   fvf  " + nextLine.toString());
+            }
+            Timber.d("First row of the csv is %s", result.get(0));
+            Timber.d("First element of second row of the csv is %s", result.get(1).get(0));
+            Timber.d("KEYS ARE %s", fetchReferenceKeys(result.get(0)));
+            buildCSV(mainMethid(), fetchReferenceKeys(result.get(0)), result.get(0), result.get(1).get(0));
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "The specified file was not found", Toast.LENGTH_SHORT).show();
+            return null;
+
+        }
+
+    }
+
+    @Override
+    public void startPreFillTask(Context context, BuildCSVListener buildCSVListener, ArrayList<String> formNames) {
+        ArrayList<ArrayList<String>> result = new ArrayList<>(); //List of list of Strings, containing sample csv downloaded.
+        CSVReader reader;
+        String fileDir = Collect.FORMS_PATH + File.separator + formNames.get(0) + "-media" + File.separator + "student_list.csv";
+        try {
+            //parsing a CSV file into CSVReader class constructor
+            reader = new CSVReader(new FileReader(new File(fileDir)));
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                result.add(new ArrayList<>(Arrays.asList(nextLine)));
+                // nextLine[] is an array of values from the line
+            }
+            Timber.d("Final read First row of the csv is %s", result);
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+        /**
+         *
+         *         try {
+         *             CSVReader reader = new CSVReader(new InputStreamReader(context.getResources().openRawResource(R.raw.sample)));//Specify asset file name
+         *             String[] nextLine;
+         *             while ((nextLine = reader.readNext()) != null) {
+         *                 result.add(new ArrayList<>(Arrays.asList(nextLine)));
+         *                 // nextLine[] is an array of values from the line
+         * //                Timber.d("The line is  " + nextLine.length + "   fvf  " + nextLine.toString());
+         *             }
+         *             Timber.d("First row of the csv is %s", result.get(0));
+         *             Timber.d("First element of second row of the csv is %s", result.get(1).get(0));
+         *             Timber.d("KEYS ARE %s", fetchReferenceKeys(result.get(0)));
+         *             buildCSV(mainMethid(), fetchReferenceKeys(result.get(0)), result.get(0), result.get(1).get(0));
+         *             return result;
+         *         } catch (Exception e) {
+         *             e.printStackTrace();
+         *             Toast.makeText(context, "The specified file was not found", Toast.LENGTH_SHORT).show();
+         *             return null;
+         *
+         *         }
+         */
+
+
+    }
+
+
+    public Set<String> fetchReferenceKeys(ArrayList<String> downloadedData) {
+        Set<String> result = new HashSet<>();
+        for (int i = 1; i < downloadedData.size(); i++) {
+            if (downloadedData.get(i).contains("_")) {
+                result.add(downloadedData.get(i).split("_")[0]);
+            } else {
+                result.add(downloadedData.get(i));
+            }
+        }
+        return result;
+    }
+
+
+    public JSONArray mainMethid() throws JSONException {
+        String data = "[\n" +
+                "   {\n" +
+                "      \"student\": \"sandeep\",\n" +
+                "      \"section\": \"a\",\n" +
+                "\t \"class\" :1\n" +
+                "   }, \n" +
+                "   {\n" +
+                "      \"student\": \"sandeep1\",\n" +
+                "      \"section\": \"a\",\n" +
+                "\t \"class\" :1\n" +
+                "   },\n" +
+                "  {\n" +
+                "      \"student\": \"sandeep2\",\n" +
+                "      \"section\": \"a\",\n" +
+                "\t \"class\" :1\n" +
+                "   },\n" +
+                "  {\n" +
+                "      \"student\": \"sandeep3\",\n" +
+                "      \"section\": \"a\",\n" +
+                "\t \"class\" :1\n" +
+                "   },\n" +
+                "  {\n" +
+                "      \"student\": \"sandeep4\",\n" +
+                "      \"section\": \"a\",\n" +
+                "\t \"class\" :4\n" +
+                "   }\n" +
+                "]";
+        JSONArray jsonArr = new JSONArray(data);
+        return jsonArr;
+    }
+
+
+    public void buildCSV(JSONArray jsonArray, Set<String> keySet, ArrayList<String> downloadedData, String title) throws JSONException {
+        ArrayList<ArrayList<String>> finalResult = new ArrayList<>();
+        finalResult.add(downloadedData);
+        boolean flag = false;
+//        JsonArray registrations = jsonArray.getAsJsonArray();
+        for (String s : keySet) {
+            if (jsonArray.getJSONObject(0).has(s))
+                flag = true;
+        }
+        for (int i = 0; i < jsonArray.length(); i++) {
+            ArrayList<String> newList = new ArrayList<>();
+            newList.add(title);
+            for (String s : keySet) {
+                newList.add(jsonArray.getJSONObject(i).get(s).toString());
+                newList.add(jsonArray.getJSONObject(i).get(s).toString());
+            }
+            finalResult.add(newList);
+        }
+
+        Timber.d("Input for CSV is %s", finalResult);
+        saveCSV(finalResult);
+    }
+
+    private void saveCSV(ArrayList<ArrayList<String>> finalResult) {
+        CSVWriter writer = null;
+        File outputFile = new File(Collect.ODK_ROOT + "/sample.csv");
+
+        try {
+            writer = new CSVWriter(new FileWriter(outputFile), ',');
+            for (ArrayList<String> list : finalResult) {
+
+                String[] stockArr = new String[list.size()];
+                stockArr = list.toArray(stockArr);
+                writer.writeNext(stockArr);
+            }
+//            String[] entries = "first#second#third".split("#"); // array of your values
+//            writer.writeNext(entries);
+            writer.close();
+
+            readCsv();
+        } catch (IOException e) {
+            Timber.e("EEEEEE");
+        }
+    }
+
+    private void readCsv() {
+        ArrayList<ArrayList<String>> result = new ArrayList<>();
+        CSVReader reader = null;
+        try {
+//parsing a CSV file into CSVReader class constructor
+            reader = new CSVReader(new FileReader(new File(Collect.ODK_ROOT + "/sample.csv")));
+
+
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                result.add(new ArrayList<>(Arrays.asList(nextLine)));
+                // nextLine[] is an array of values from the line
+//                Timber.d("The line is  " + nextLine.length + "   fvf  " + nextLine.toString());
+            }
+            Timber.d("Final read First row of the csv is %s", result);
+//            String [] nextLine;
+////reads one line at a time
+//            while ((nextLine = reader.readNext()) != null)
+//            {
+//                for(String token : nextLine)
+//                {
+//                    System.out.print(token);
+//                }
+//                System.out.print("\n");
+//            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private List<String[]> readCVSFromAssetFolder(Context context) {
+        List<String[]> csvLine = new ArrayList<>();
+        String[] content = null;
+        try {
+            InputStream inputStream = context.getAssets().open("sample.csv");
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                content = line.split(",");
+                csvLine.add(content);
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return csvLine;
+    }
+
+    private void printCVSContent(List<String[]> result) {
+        String cvsColumn = "";
+        for (int i = 0; i < result.size(); i++) {
+            String[] rows = result.get(i);
+            cvsColumn += rows[0] + " " + rows[1] + " " + rows[2] + "\n";
+        }
+        Timber.i("This is it %s", cvsColumn);
+    }
+// try{
+////            InputStream inputStream = context.getResources().openRawResource(settingResId);
+//
+//        String csvfileString = context.getApplicationInfo().dataDir + File.separatorChar + "strings.csv";
+//        File csvfile = new File(csvfileString);
+//        String path = csvfile.getAbsolutePath();
+//        CSVReader reader = new CSVReader(new FileReader(path));
+//        String [] nextLine;
+//        while ((nextLine = reader.readNext()) != null) {
+//            // nextLine[] is an array of values from the line
+//            System.out.println(nextLine[0] + nextLine[1] + "etc...");
+//        }
+//    }catch(FileNotFoundException e){
+//        e.printStackTrace();
+//        Toast.makeText(context, "The specified file was not found", Toast.LENGTH_SHORT).show();
+//    } catch (IOException e) {
+//        e.printStackTrace();
+//    }
 }

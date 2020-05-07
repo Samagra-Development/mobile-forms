@@ -5,8 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.samagra.ancillaryscreens.screens.splash.SplashActivity;
-import com.samagra.commons.utils.AlertDialogUtils;
 import com.samagra.commons.utils.FormDownloadStatus;
 import com.samagra.odktest.MyApplication;
 import com.samagra.odktest.R;
@@ -16,6 +14,7 @@ import com.samagra.odktest.base.BasePresenter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.odk.collect.android.contracts.BuildCSVListener;
 import org.odk.collect.android.contracts.DataFormDownloadResultCallback;
 import org.odk.collect.android.contracts.FormListDownloadResultCallback;
 import org.odk.collect.android.contracts.IFormManagementContract;
@@ -65,8 +64,26 @@ public class HomePresenter<V extends HomeMvpView, I extends HomeMvpInteractor> e
         return formsDownloadStatus == FormDownloadStatus.DOWNLOADING;
     }
 
+    @Override
+    public void fetchPrefillDynamicData() {
+        ArrayList<String> formName = new ArrayList<>();
+        formName.add("Homework");
+        getIFormManagementContract().startPreFillTask(getMvpView().getActivityContext(), new BuildCSVListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        },formName );
+//        ArrayList<ArrayList<String>> data = getIFormManagementContract().readDownloadedFormReferenceCSV(getMvpView().getActivityContext());
+    }
+
     private String getUserRoleFromPref() {
-        return "Test";
+        return "Sample";
 //        return getMvpInteractor().getPreferenceHelper().getUserRoleFromPref(); //Viewing and download of forms is based on User's role, you can configure it via Preferences when logging in as per User's Login response
     }
 
@@ -164,11 +181,15 @@ public class HomePresenter<V extends HomeMvpView, I extends HomeMvpInteractor> e
             String formsString = MyApplication.getmFirebaseRemoteConfig().getString(getRoleFromRoleMappingFirebase(getUserRoleFromPref()));
             HashMap<String, String> userRoleBasedForms = getIFormManagementContract().downloadFormList(formsString);
             // Download Forms if updates available or if forms not downloaded. Delete forms if not applied for the role.
-            HashMap<String, String> formsToBeDownloaded = getIFormManagementContract().downloadNewFormsBasedOnDownloadedFormList(userRoleBasedForms, latestFormListFromServer);
+            HashMap<String, String> formsToBeDownloaded =getIFormManagementContract().downloadNewFormsBasedOnDownloadedFormList(userRoleBasedForms, latestFormListFromServer);
+//                    new HashMap<>();
+//formsToBeDownloaded.put("sample_homework","Homework")/;
+//
             if (formsToBeDownloaded.size() > 0)
                 formsDownloadStatus = FormDownloadStatus.DOWNLOADING;
             else {
                 formsDownloadStatus = FormDownloadStatus.SUCCESS;
+                getMvpView().renderLayoutVisible();
             }
             if (formsDownloadStatus == FormDownloadStatus.DOWNLOADING)
                 getIFormManagementContract().downloadODKForms(new FormDownloadListener(), formsToBeDownloaded);

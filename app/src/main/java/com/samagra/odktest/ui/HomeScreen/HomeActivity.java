@@ -45,6 +45,9 @@ public class HomeActivity extends BaseActivity implements HomeMvpView {
     @BindView(R.id.parent)
     public RelativeLayout parentLayout;
 
+    @BindView(R.id.get_dynamic_cascading_module_data)
+    public Button get_dynamic_cascading_module_data;
+
     private PopupMenu popupMenu;
 
     private Unbinder unbinder;
@@ -73,7 +76,15 @@ public class HomeActivity extends BaseActivity implements HomeMvpView {
         show_specific_odk_forms.setOnClickListener(v -> {
             homePresenter.onViewSpecificFormClicked();
         });
+
+        get_dynamic_cascading_module_data.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                homePresenter.fetchPrefillDynamicData();
+            }
+        });
         downloadODKForms.setOnClickListener(v -> {
+//            homePr//esenter.checkForFormUpdates();
             if (!homePresenter.isNetworkConnected()) {
                 SnackbarUtils.showLongSnackbar(parentLayout, "Please connect to the internet.");
             } else {
@@ -110,6 +121,7 @@ public class HomeActivity extends BaseActivity implements HomeMvpView {
         circularProgressBar.setVisibility(View.GONE);
         view_odk_forms.setVisibility(View.VISIBLE);
         show_specific_odk_forms.setVisibility(View.VISIBLE);
+        get_dynamic_cascading_module_data.setVisibility(View.VISIBLE);
 
     }
 
@@ -123,7 +135,6 @@ public class HomeActivity extends BaseActivity implements HomeMvpView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         homePresenter.onDetach();
         unbinder.unbind();
     }

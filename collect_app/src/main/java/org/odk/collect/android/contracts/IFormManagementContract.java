@@ -9,10 +9,15 @@ import org.odk.collect.android.listeners.FormListDownloaderListener;
 import org.odk.collect.android.logic.FormDetails;
 import org.w3c.dom.Document;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public interface IFormManagementContract {
+
+    ArrayList<ArrayList<String>> readDownloadedFormReferenceCSV(Context context);
+
+    void startPreFillTask(Context context, BuildCSVListener buildCSVListener, ArrayList<String> formNames);
 
     /**
      *
