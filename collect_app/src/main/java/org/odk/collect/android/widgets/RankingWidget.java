@@ -28,7 +28,9 @@ import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.fragments.dialogs.RankingWidgetDialog;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.widgets.interfaces.BinaryWidget;
@@ -90,7 +92,7 @@ public class RankingWidget extends ItemsWidget implements BinaryWidget {
 
     @Override
     public void onButtonClick(int buttonId) {
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         if (formController != null) {
             formController.setIndexWaitingForData(getFormEntryPrompt().getIndex());
         }

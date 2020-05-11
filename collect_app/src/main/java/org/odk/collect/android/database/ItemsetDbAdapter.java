@@ -6,7 +6,9 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -40,7 +42,7 @@ public class ItemsetDbAdapter {
      */
     private static class DatabaseHelper extends SQLiteOpenHelper {
         DatabaseHelper() {
-            super(new DatabaseContext(Collect.METADATA_PATH), DATABASE_NAME, null, DATABASE_VERSION);
+            super(new DatabaseContext(CollectInitialiser.INSTANCE.getMETADATA_PATH()), DATABASE_NAME, null, DATABASE_VERSION);
         }
 
         @Override

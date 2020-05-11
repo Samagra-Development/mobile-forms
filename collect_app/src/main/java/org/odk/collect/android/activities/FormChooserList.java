@@ -29,7 +29,9 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.helpers.ContentResolverHelper;
 import org.odk.collect.android.listeners.DiskSyncListener;
@@ -72,7 +74,7 @@ public class FormChooserList extends FormListActivity implements
             public void granted() {
                 // must be at the beginning of any activity that can be called from an external intent
                 try {
-                    Collect.createODKDirs();
+                    CollectInitialiser.INSTANCE.createODKDirs();
                     init();
                 } catch (RuntimeException e) {
                     createErrorDialog(e.getMessage(), EXIT);
@@ -120,7 +122,7 @@ public class FormChooserList extends FormListActivity implements
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (Collect.allowClick(getClass().getName())) {
+        if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
             // get uri to form
             long idFormsTable = listView.getAdapter().getItemId(position);
             Uri formUri = ContentUris.withAppendedId(FormsColumns.CONTENT_URI, idFormsTable);

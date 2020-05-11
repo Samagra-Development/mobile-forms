@@ -8,7 +8,9 @@ import android.preference.PreferenceManager;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsManager;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.events.RxEventBus;
 import org.odk.collect.android.events.SmsRxEvent;
 import org.odk.collect.android.preferences.GeneralKeys;
@@ -44,7 +46,7 @@ public class SmsSender {
         this.context = context;
         this.instanceId = instanceId;
 
-        Collect.getInstance().getComponent().inject(this);
+        CollectInitialiser.INSTANCE.getComponent().inject(this);
     }
 
     public boolean send() {

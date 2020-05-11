@@ -39,7 +39,9 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.DrawActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.utilities.ApplicationConstants;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.MediaManager;
@@ -247,7 +249,7 @@ public abstract class BaseImageWidget extends QuestionWidget implements FileWidg
 
         @Override
         public void clickImage(String context) {
-            if (Collect.allowClick(getClass().getName())) {
+            if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
                 launchDrawActivity();
             }
         }
@@ -261,7 +263,7 @@ public abstract class BaseImageWidget extends QuestionWidget implements FileWidg
                 File f = new File(getInstanceFolder() + File.separator + binaryName);
                 i.putExtra(DrawActivity.REF_IMAGE, Uri.fromFile(f));
             }
-            i.putExtra(DrawActivity.EXTRA_OUTPUT, Uri.fromFile(new File(Collect.TMPFILE_PATH)));
+            i.putExtra(DrawActivity.EXTRA_OUTPUT, Uri.fromFile(new File(CollectInitialiser.INSTANCE.getTMPFILE_PATH())));
             i = addExtrasToIntent(i);
             launchActivityForResult(i, requestCode, stringResourceId);
         }

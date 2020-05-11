@@ -23,7 +23,9 @@ import android.net.Uri;
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Element;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.http.CollectServerClient;
 import org.odk.collect.android.listeners.FormDownloaderListener;
@@ -58,7 +60,7 @@ public class FormDownloader {
     @Inject CollectServerClient collectServerClient;
 
     public FormDownloader() {
-        Collect.getInstance().getComponent().inject(this);
+        CollectInitialiser.INSTANCE.getComponent().inject(this);
     }
 
     public void setDownloaderListener(FormDownloaderListener sl) {
@@ -99,7 +101,7 @@ public class FormDownloader {
             try {
                 String message = processOneForm(total, count++, fd);
                 result.put(fd, message.isEmpty() ?
-                        Collect.getInstance().getString(R.string.success) : message);
+                        InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.success) : message);
             } catch (TaskCancelledException cd) {
                 break;
             }
@@ -136,7 +138,7 @@ public class FormDownloader {
 
             if (fd.getManifestUrl() != null) {
                 // use a temporary media path until everything is ok.
-                tempMediaPath = new File(Collect.CACHE_PATH,
+                tempMediaPath = new File(CollectInitialiser.INSTANCE.getCACHE_PATH(),
                         String.valueOf(System.currentTimeMillis())).getAbsolutePath();
                 finalMediaPath = FileUtils.constructMediaPath(
                         fileResult.getFile().getAbsolutePath());
@@ -182,12 +184,12 @@ public class FormDownloader {
             if (isSubmissionOk(parsedFields)) {
                 installed = installEverything(tempMediaPath, fileResult, parsedFields);
             } else {
-                message += Collect.getInstance().getString(R.string.xform_parse_error,
+                message += InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.xform_parse_error,
                         fileResult.file.getName(), "submission url");
             }
         }
         if (!installed) {
-            message += Collect.getInstance().getString(R.string.copying_media_files_failed);
+            message += InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.copying_media_files_failed);
             cleanUp(fileResult, null, tempMediaPath);
         }
         return message;
@@ -221,7 +223,7 @@ public class FormDownloader {
                 // this means we should delete the entire form together with the metadata
                 Uri uri = uriResult.getUri();
                 Timber.w("The form is new. We should delete the entire form.");
-                int deletedCount = Collect.getInstance().getContentResolver().delete(uri,
+                int deletedCount =InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().delete(uri,
                         null, null);
                 Timber.w("Deleted %d rows using uri %s", deletedCount, uri.toString());
             }
@@ -326,11 +328,11 @@ public class FormDownloader {
         rootName = rootName.trim();
 
         // proposed name of xml file...
-        String path = Collect.FORMS_PATH + File.separator + rootName + ".xml";
+        String path = CollectInitialiser.INSTANCE.getFORMS_PATH() + File.separator + rootName + ".xml";
         int i = 2;
         File f = new File(path);
         while (f.exists()) {
-            path = Collect.FORMS_PATH + File.separator + rootName + "_" + i + ".xml";
+            path = CollectInitialiser.INSTANCE.getFORMS_PATH() + File.separator + rootName + "_" + i + ".xml";
             f = new File(path);
             i++;
         }
@@ -382,7 +384,7 @@ public class FormDownloader {
     private void downloadFile(File file, String downloadUrl)
             throws IOException, TaskCancelledException, URISyntaxException, Exception {
         File tempFile = File.createTempFile(file.getName(), TEMP_DOWNLOAD_EXTENSION,
-                new File(Collect.CACHE_PATH));
+                new File(CollectInitialiser.INSTANCE.getCACHE_PATH()));
 
         // WiFi network connections can be renegotiated during a large form download sequence.
         // This will cause intermittent download failures.  Silently retry once after each
@@ -465,7 +467,7 @@ public class FormDownloader {
             Timber.w("Copied %s over %s", tempFile.getAbsolutePath(), file.getAbsolutePath());
             FileUtils.deleteAndReport(tempFile);
         } else {
-            String msg = Collect.getInstance().getString(R.string.fs_file_copy_error,
+            String msg = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.fs_file_copy_error,
                     tempFile.getAbsolutePath(), file.getAbsolutePath(), errorMessage);
             Timber.w(msg);
             throw new RuntimeException(msg);
@@ -524,7 +526,7 @@ public class FormDownloader {
         }
 
         if (stateListener != null) {
-            stateListener.progressUpdate(Collect.getInstance().getString(R.string.fetching_manifest, fd.getFormName()),
+            stateListener.progressUpdate(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.fetching_manifest, fd.getFormName()),
                     String.valueOf(count), String.valueOf(total));
         }
 
@@ -536,10 +538,10 @@ public class FormDownloader {
             return result.errorMessage;
         }
 
-        String errMessage = Collect.getInstance().getString(R.string.access_error, fd.getManifestUrl());
+        String errMessage = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.access_error, fd.getManifestUrl());
 
         if (!result.isOpenRosaResponse) {
-            errMessage += Collect.getInstance().getString(R.string.manifest_server_error);
+            errMessage += InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.manifest_server_error);
             Timber.e(errMessage);
             return errMessage;
         }
@@ -548,14 +550,14 @@ public class FormDownloader {
         Element manifestElement = result.doc.getRootElement();
         if (!manifestElement.getName().equals("manifest")) {
             errMessage +=
-                    Collect.getInstance().getString(R.string.root_element_error,
+                    InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.root_element_error,
                             manifestElement.getName());
             Timber.e(errMessage);
             return errMessage;
         }
         String namespace = manifestElement.getNamespace();
         if (!isXformsManifestNamespacedElement(manifestElement)) {
-            errMessage += Collect.getInstance().getString(R.string.root_namespace_error, namespace);
+            errMessage += InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.root_namespace_error, namespace);
             Timber.e(errMessage);
             return errMessage;
         }
@@ -611,7 +613,7 @@ public class FormDownloader {
                 }
                 if (filename == null || downloadUrl == null || hash == null) {
                     errMessage +=
-                            Collect.getInstance().getString(R.string.manifest_tag_error,
+                            InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.manifest_tag_error,
                                     Integer.toString(i));
                     Timber.e(errMessage);
                     return errMessage;
@@ -634,7 +636,7 @@ public class FormDownloader {
                 ++mediaCount;
                 if (stateListener != null) {
                     stateListener.progressUpdate(
-                            Collect.getInstance().getString(R.string.form_download_progress,
+                            InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.form_download_progress,
                                     fd.getFormName(),
                                     String.valueOf(mediaCount), String.valueOf(files.size())),
                             String.valueOf(count), String.valueOf(total));

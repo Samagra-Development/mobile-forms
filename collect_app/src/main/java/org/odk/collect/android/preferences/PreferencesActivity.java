@@ -20,7 +20,9 @@ import android.os.Bundle;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.CollectAbstractActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.listeners.OnBackPressedListener;
 import org.odk.collect.android.utilities.ThemeUtils;
 
@@ -48,7 +50,7 @@ public class PreferencesActivity extends CollectAbstractActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Collect.getInstance().initProperties();
+        CollectInitialiser.INSTANCE.initProperties();
     }
 
     // If the onBackPressedListener is set then onBackPressed is delegated to it.

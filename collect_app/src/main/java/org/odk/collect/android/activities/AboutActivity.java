@@ -30,7 +30,9 @@ import android.widget.Toast;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.AboutListAdapter;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.utilities.CustomTabHelper;
 
 import java.util.List;
@@ -85,7 +87,7 @@ public class AboutActivity extends CollectAbstractActivity implements
 
     @Override
     public void onClick(int position) {
-        if (Collect.allowClick(getClass().getName())) {
+        if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
             switch (position) {
                 case 0:
                     websiteTabHelper.openUri(this, websiteUri);
@@ -121,7 +123,7 @@ public class AboutActivity extends CollectAbstractActivity implements
                             }
                         }
                     } catch (android.content.ActivityNotFoundException anfe) {
-                        Toast.makeText(Collect.getInstance(),
+                        Toast.makeText( InfrastructureProvider.INSTANCE.getApplicationContext(),
                                 getString(R.string.activity_not_found, "market view"),
                                 Toast.LENGTH_SHORT).show();
                         Timber.d(anfe);

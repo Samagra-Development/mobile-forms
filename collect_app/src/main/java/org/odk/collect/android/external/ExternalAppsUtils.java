@@ -35,7 +35,9 @@ import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.exception.ExternalParamsException;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
@@ -134,7 +136,7 @@ public class ExternalAppsUtils {
 
     public static Object getValueRepresentedBy(String text, TreeReference reference)
             throws XPathSyntaxException {
-        FormDef formDef = Collect.getInstance().getFormController().getFormDef();
+        FormDef formDef = CollectInitialiser.INSTANCE.getFormController().getFormDef();
         FormInstance formInstance = formDef.getInstance();
         EvaluationContext evaluationContext = new EvaluationContext(formDef.getEvaluationContext(),
                 reference);
@@ -149,7 +151,7 @@ public class ExternalAppsUtils {
             return XPathFuncExpr.unpack(xpathNodeset);
         } else if (text.equals("instanceProviderID()")) {
             // instanceProviderID returns -1 if the current instance has not been saved to disk already
-            String path = Collect.getInstance().getFormController().getInstanceFile()
+            String path = CollectInitialiser.INSTANCE.getFormController().getInstanceFile()
                     .getAbsolutePath();
 
             String instanceProviderID = "-1";

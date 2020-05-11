@@ -18,7 +18,11 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormChooserList;
 import org.odk.collect.android.activities.InstanceChooserList;
 import org.odk.collect.android.activities.InstanceUploaderListActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.helpers.ContentResolverHelper;
 import org.odk.collect.android.dto.Form;
@@ -81,11 +85,10 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
     public void resetPreviousODKForms() {
         final List<Integer> resetActions = new ArrayList<>();
         resetActions.add(ResetUtility.ResetAction.RESET_FORMS);
-        resetActions.add(ResetUtility.ResetAction.RESET_PREFERENCES);
         resetActions.add(ResetUtility.ResetAction.RESET_LAYERS);
         resetActions.add(ResetUtility.ResetAction.RESET_CACHE);
         resetActions.add(ResetUtility.ResetAction.RESET_OSM_DROID);
-        Runnable runnable = () -> new ResetUtility().reset(Collect.getInstance().getApplicationContext(), resetActions);
+        Runnable runnable = () -> new ResetUtility().reset(InfrastructureProvider.INSTANCE.getApplicationContext(), resetActions);
         new Thread(runnable).start();
     }
 
@@ -98,10 +101,10 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
         resetActions.add(ResetUtility.ResetAction.RESET_CACHE);
         resetActions.add(ResetUtility.ResetAction.RESET_OSM_DROID);
 
-        List<Integer> failedResetActions = new ResetUtility().reset(Collect.getInstance().getApplicationContext(), resetActions);
+        List<Integer> failedResetActions = new ResetUtility().reset(InfrastructureProvider.INSTANCE.getApplicationContext(), resetActions);
         Timber.e("Reset Complete%s", failedResetActions.size());
 
-        File dir = new File(Collect.INSTANCES_PATH);
+        File dir = new File(CollectInitialiser.INSTANCE.getINSTANCES_PATH());
         if (dir.isDirectory()) {
             String[] children = dir.list();
             for (String child : children) {
@@ -116,7 +119,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
 
     @Override
     public void createODKDirectories() {
-        Collect.createODKDirs();
+        CollectInitialiser.INSTANCE.createODKDirs();
     }
 
     @Override
@@ -155,7 +158,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
 
     @Override
     public void initialiseODKProps() {
-        Collect.getInstance().initProperties();
+        CollectInitialiser.INSTANCE.initProperties();
     }
 
     @Override
@@ -275,7 +278,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
     @Override
     public void launchViewUnsubmittedFormView(Context context, String className) {
 
-        if (Collect.allowClick(className)){
+        if (CollectInitialiser.INSTANCE.allowClick(className)){
             Intent i = new Intent(context, InstanceUploaderListActivity.class);
             context.startActivity(i);
         }
@@ -385,7 +388,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
             Map.Entry pair = (Map.Entry) it.next();
             String formName = pair.getValue().toString();
             String formID = pair.getKey().toString();
-            String fileName = Collect.FORMS_PATH + File.separator + formName + ".xml";
+            String fileName = CollectInitialiser.INSTANCE.getFORMS_PATH() + File.separator + formName + ".xml";
             String serverURL = new WebCredentialsUtils().getServerUrlFromPreferences();
             String partURL = "/www/formXml?formId=";
             String downloadUrl = serverURL + partURL + formID;

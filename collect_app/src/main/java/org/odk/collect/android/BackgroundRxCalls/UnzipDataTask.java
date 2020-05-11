@@ -6,7 +6,9 @@ import android.widget.Toast;
 
 import org.odk.collect.android.BuildConfig;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,7 +32,7 @@ import timber.log.Timber;
 public class UnzipDataTask {
 
     private WeakReference<Context> contextWeakReference;
-    private File outputFile = new File(Collect.ODK_ROOT + "/data.json");
+    private File outputFile = new File(CollectInitialiser.INSTANCE.getODK_ROOT() + "/data.json");
     private InputStream inputStream = null;
 
     public UnzipDataTask(Context context) {

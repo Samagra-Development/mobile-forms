@@ -42,7 +42,9 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.listeners.AudioPlayListener;
 import org.odk.collect.android.listeners.WidgetValueChangedListener;
 import org.odk.collect.android.logic.FormController;
@@ -127,7 +129,7 @@ public abstract class QuestionWidget
             }
         });
 
-        questionFontSize = Collect.getQuestionFontsize();
+        questionFontSize = CollectInitialiser.INSTANCE.getQuestionFontsize();
 
         formEntryPrompt = prompt;
 
@@ -546,7 +548,7 @@ public abstract class QuestionWidget
             button.setLayoutParams(params);
 
             button.setOnClickListener(v -> {
-                if (Collect.allowClick(QuestionWidget.class.getName())) {
+                if (CollectInitialiser.INSTANCE.allowClick(QuestionWidget.class.getName())) {
                     ((ButtonWidget) this).onButtonClick(withId);
                 }
             });
@@ -599,12 +601,12 @@ public abstract class QuestionWidget
 
     @Override
     public final void waitForData() {
-        Collect collect = Collect.getInstance();
-        if (collect == null) {
+        Context collect = InfrastructureProvider.INSTANCE.getApplicationContext();
+        if (collect == null || CollectInitialiser.INSTANCE==null) {
             throw new IllegalStateException("Collect application instance is null.");
         }
 
-        FormController formController = collect.getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         if (formController == null) {
             return;
         }
@@ -614,12 +616,12 @@ public abstract class QuestionWidget
 
     @Override
     public final void cancelWaitingForData() {
-        Collect collect = Collect.getInstance();
-        if (collect == null) {
+        Context collect = InfrastructureProvider.INSTANCE.getApplicationContext();
+        if (collect == null || CollectInitialiser.INSTANCE==null) {
             throw new IllegalStateException("Collect application instance is null.");
         }
 
-        FormController formController = collect.getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         if (formController == null) {
             return;
         }
@@ -629,12 +631,12 @@ public abstract class QuestionWidget
 
     @Override
     public final boolean isWaitingForData() {
-        Collect collect = Collect.getInstance();
-        if (collect == null) {
+        Context collect = InfrastructureProvider.INSTANCE.getApplicationContext();
+        if (collect == null || CollectInitialiser.INSTANCE==null) {
             throw new IllegalStateException("Collect application instance is null.");
         }
 
-        FormController formController = collect.getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         if (formController == null) {
             return false;
         }
@@ -647,12 +649,12 @@ public abstract class QuestionWidget
 
     @Nullable
     public final String getInstanceFolder() {
-        Collect collect = Collect.getInstance();
-        if (collect == null) {
+        Context collect = InfrastructureProvider.INSTANCE.getApplicationContext();
+        if (collect == null || CollectInitialiser.INSTANCE==null) {
             throw new IllegalStateException("Collect application instance is null.");
         }
 
-        FormController formController = collect.getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         if (formController == null) {
             return null;
         }

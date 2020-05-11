@@ -33,7 +33,9 @@ import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.database.ItemsetDbAdapter;
 import org.odk.collect.android.external.ExternalAnswerResolver;
 import org.odk.collect.android.external.ExternalDataHandler;
@@ -138,7 +140,7 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
         // This should get moved to the Application Class
         if (referenceManager.getFactories().length == 0) {
             // this is /sdcard/odk
-            referenceManager.addReferenceFactory(new FileReferenceFactory(Collect.ODK_ROOT));
+            referenceManager.addReferenceFactory(new FileReferenceFactory(CollectInitialiser.INSTANCE.getODK_ROOT()));
         }
 
         addSessionRootTranslators(formMediaDir.getName(), referenceManager,
@@ -149,7 +151,7 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
             formDef = createFormDefFromCacheOrXml(formPath, formXml);
         } catch (StackOverflowError e) {
             Timber.e(e);
-            errorMsg = Collect.getInstance().getString(R.string.too_complex_form);
+            errorMsg = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.too_complex_form);
         }
 
         if (errorMsg != null || formDef == null) {
@@ -232,7 +234,7 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
 
     private FormDef createFormDefFromCacheOrXml(String formPath, File formXml) {
         publishProgress(
-                Collect.getInstance().getString(R.string.survey_loading_reading_form_message));
+                InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.survey_loading_reading_form_message));
 
         final FormDef formDefFromCache = FormDefCache.readCache(formXml);
         if (formDefFromCache != null) {
@@ -327,7 +329,7 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
                 // This order is important. Import data, then initialize.
                 try {
                     Timber.i("Importing data");
-                    publishProgress(Collect.getInstance().getString(R.string.survey_loading_reading_data_message));
+                    publishProgress(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.survey_loading_reading_data_message));
                     importData(instanceXml, fec);
                     formDef.initialize(false, instanceInit);
                 } catch (IOException | RuntimeException e) {
@@ -393,8 +395,7 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
 
             if (!externalDataMap.isEmpty()) {
 
-                publishProgress(Collect.getInstance()
-                        .getString(R.string.survey_loading_reading_csv_message));
+                publishProgress(InfrastructureProvider.INSTANCE.getApplicationContext().getString(R.string.survey_loading_reading_csv_message));
 
                 ExternalDataReader externalDataReader = new ExternalDataReaderImpl(this);
                 externalDataReader.doImport(externalDataMap);

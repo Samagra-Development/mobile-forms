@@ -8,7 +8,9 @@ import com.mapbox.mapboxsdk.Mapbox;
 
 import org.odk.collect.android.BuildConfig;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 
 public class MapboxUtils {
     private static boolean initAttempted;
@@ -27,7 +29,7 @@ public class MapboxUtils {
         // To use the Mapbox base maps, we have to initialize the Mapbox SDK with
         // an access token. Configure this token in collect_app/secrets.properties.
         try {
-            mapbox = Mapbox.getInstance(Collect.getInstance(), BuildConfig.MAPBOX_ACCESS_TOKEN);
+            mapbox = Mapbox.getInstance(InfrastructureProvider.INSTANCE.getApplicationContext(), BuildConfig.MAPBOX_ACCESS_TOKEN);
         } catch (Exception | Error e) {
             // Initialization failed (usually because the Mapbox native library for
             // the current architecture could not be found or loaded).

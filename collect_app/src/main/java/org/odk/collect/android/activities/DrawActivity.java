@@ -38,7 +38,10 @@ import com.rarepebble.colorpicker.ColorPickerView;
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.IconMenuListAdapter;
 import org.odk.collect.android.adapters.model.IconMenuItem;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.utilities.AnimateUtils;
 import org.odk.collect.android.utilities.DialogUtils;
 import org.odk.collect.android.utilities.FileUtils;
@@ -152,9 +155,9 @@ public class DrawActivity extends CollectAbstractActivity {
         if (extras == null) {
             loadOption = OPTION_DRAW;
             refImage = null;
-            savepointImage = new File(Collect.TMPDRAWFILE_PATH);
+            savepointImage = new File(CollectInitialiser.INSTANCE.getTMPDRAWFILE_PATH());
             savepointImage.delete();
-            output = new File(Collect.TMPFILE_PATH);
+            output = new File(CollectInitialiser.INSTANCE.getTMPFILE_PATH());
         } else {
             if (extras.getInt(SCREEN_ORIENTATION) == 1) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -176,7 +179,7 @@ public class DrawActivity extends CollectAbstractActivity {
                     FileUtils.copyFile(refImage, savepointImage);
                 }
             } else {
-                savepointImage = new File(Collect.TMPDRAWFILE_PATH);
+                savepointImage = new File(CollectInitialiser.INSTANCE.getTMPDRAWFILE_PATH());
                 savepointImage.delete();
                 if (refImage != null && refImage.exists()) {
                     FileUtils.copyFile(refImage, savepointImage);
@@ -186,7 +189,7 @@ public class DrawActivity extends CollectAbstractActivity {
             if (uri != null) {
                 output = new File(uri.getPath());
             } else {
-                output = new File(Collect.TMPFILE_PATH);
+                output = new File(CollectInitialiser.INSTANCE.getTMPFILE_PATH());
             }
         }
 

@@ -24,7 +24,9 @@ import android.telephony.TelephonyManager;
 
 import org.javarosa.core.services.IPropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.events.ReadPhoneStatePermissionRxEvent;
 import org.odk.collect.android.events.RxEventBus;
 
@@ -88,7 +90,7 @@ public class PropertyManager implements IPropertyManager {
     public PropertyManager(Context context) {
         Timber.i("calling constructor");
 
-        Collect.getInstance().getComponent().inject(this);
+        CollectInitialiser.INSTANCE.getComponent().inject(this);
         try {
             // Device-defined properties
             TelephonyManager telMgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -171,7 +173,7 @@ public class PropertyManager implements IPropertyManager {
 
     @Override
     public String getSingularProperty(String propertyName) {
-        if (!isReadPhoneStatePermissionGranted(Collect.getInstance()) && isPropertyDangerous(propertyName)) {
+        if (!isReadPhoneStatePermissionGranted(InfrastructureProvider.INSTANCE.getApplicationContext()) && isPropertyDangerous(propertyName)) {
             eventBus.post(new ReadPhoneStatePermissionRxEvent());
         }
 

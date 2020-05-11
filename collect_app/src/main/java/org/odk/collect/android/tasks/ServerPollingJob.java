@@ -32,7 +32,9 @@ import com.evernote.android.job.JobRequest;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormDownloadList;
 import org.odk.collect.android.activities.NotificationActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.logic.FormDetails;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
@@ -70,7 +72,7 @@ public class ServerPollingJob extends Job {
     DownloadFormListUtils downloadFormListUtils;
 
     public ServerPollingJob() {
-        Collect.getInstance().getComponent().inject(this);
+        CollectInitialiser.INSTANCE.getComponent().inject(this);
     }
 
     @Override
@@ -101,7 +103,7 @@ public class ServerPollingJob extends Job {
             if (!newDetectedForms.isEmpty()) {
                 if (GeneralSharedPreferences.getInstance().getBoolean(KEY_AUTOMATIC_UPDATE, false)) {
                     final HashMap<FormDetails, String> result = new FormDownloader().downloadForms(newDetectedForms);
-                    informAboutNewDownloadedForms(Collect.getInstance().getString(R.string.download_forms_result), result);
+                    informAboutNewDownloadedForms(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.download_forms_result), result);
                 } else {
                     for (FormDetails formDetails : newDetectedForms) {
                         String manifestFileHash = formDetails.getManifestFileHash() != null ? formDetails.getManifestFileHash() : "";
@@ -125,15 +127,15 @@ public class ServerPollingJob extends Job {
     }
 
     public static void schedulePeriodicJob(String selectedOption) {
-        if (selectedOption.equals(Collect.getInstance().getString(R.string.never_value))) {
+        if (selectedOption.equals(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.never_value))) {
             JobManager.instance().cancelAllForTag(TAG);
         } else {
             long period = FIFTEEN_MINUTES_PERIOD;
-            if (selectedOption.equals(Collect.getInstance().getString(R.string.every_one_hour_value))) {
+            if (selectedOption.equals(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.every_one_hour_value))) {
                 period = ONE_HOUR_PERIOD;
-            } else if (selectedOption.equals(Collect.getInstance().getString(R.string.every_six_hours_value))) {
+            } else if (selectedOption.equals(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.every_six_hours_value))) {
                 period = SIX_HOURS_PERIOD;
-            } else if (selectedOption.equals(Collect.getInstance().getString(R.string.every_24_hours_value))) {
+            } else if (selectedOption.equals(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.every_24_hours_value))) {
                 period = ONE_DAY_PERIOD;
             }
 
@@ -164,7 +166,7 @@ public class ServerPollingJob extends Job {
     }
 
     private void informAboutNewDownloadedForms(String title, HashMap<FormDetails, String> result) {
-        Intent intent = new Intent(Collect.getInstance(), NotificationActivity.class);
+        Intent intent = new Intent(InfrastructureProvider.INSTANCE.getApplication(), NotificationActivity.class);
         intent.putExtra(NotificationActivity.NOTIFICATION_TITLE, title);
         intent.putExtra(NotificationActivity.NOTIFICATION_MESSAGE, FormDownloadList.getDownloadResultMessage(result));
         PendingIntent contentIntent = PendingIntent.getActivity(getContext(), FORMS_DOWNLOADED_NOTIFICATION, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -183,20 +185,20 @@ public class ServerPollingJob extends Job {
 
     private boolean isDeviceOnline() {
         ConnectivityManager connMgr =
-                (ConnectivityManager) Collect.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) InfrastructureProvider.INSTANCE.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }
 
     private String getContentText(HashMap<FormDetails, String> result) {
         return allFormsDownloadedSuccessfully(result)
-                ? Collect.getInstance().getString(R.string.success)
-                : Collect.getInstance().getString(R.string.failures);
+                ? InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.success)
+                : InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.failures);
     }
 
     private boolean allFormsDownloadedSuccessfully(HashMap<FormDetails, String> result) {
         for (Map.Entry<FormDetails, String> item : result.entrySet()) {
-            if (!item.getValue().equals(Collect.getInstance().getString(R.string.success))) {
+            if (!item.getValue().equals(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.success))) {
                 return false;
             }
         }

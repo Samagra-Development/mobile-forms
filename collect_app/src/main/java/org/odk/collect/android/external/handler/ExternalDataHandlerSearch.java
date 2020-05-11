@@ -25,7 +25,9 @@ import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.exception.ExternalDataException;
 import org.odk.collect.android.external.ExternalDataManager;
 import org.odk.collect.android.external.ExternalDataUtil;
@@ -99,7 +101,7 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
             // we should never get here since it is already handled in ExternalDataUtil
             // .getSearchXPathExpression(String appearance)
             throw new ExternalDataException(
-                    Collect.getInstance().getString(R.string.ext_search_wrong_arguments_error));
+                    InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.ext_search_wrong_arguments_error));
         }
 
         String searchType = null;
@@ -181,7 +183,7 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
                 c = db.query(ExternalDataUtil.EXTERNAL_DATA_TABLE_NAME, sqlColumns, selection,
                         selectionArgs, null, null, ExternalDataUtil.SORT_COLUMN_NAME);
             } catch (Exception e) {
-                Timber.e(Collect.getInstance().getString(R.string.ext_import_csv_missing_error, dataSetName, dataSetName));
+                Timber.e(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.ext_import_csv_missing_error, dataSetName, dataSetName));
                 c = db.query(ExternalDataUtil.EXTERNAL_DATA_TABLE_NAME, sqlColumns, selection,
                         selectionArgs, null, null, null);
             }

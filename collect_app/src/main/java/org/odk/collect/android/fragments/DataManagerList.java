@@ -29,7 +29,9 @@ import android.widget.ListView;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.InstanceListCursorAdapter;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.listeners.DeleteInstancesListener;
 import org.odk.collect.android.listeners.DiskSyncListener;
@@ -78,7 +80,7 @@ public class DataManagerList extends InstanceListFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Collect.getInstance().getComponent().inject(this);
+        CollectInitialiser.INSTANCE.getComponent().inject(this);
     }
 
     @Override

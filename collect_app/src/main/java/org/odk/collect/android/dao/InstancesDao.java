@@ -21,7 +21,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import androidx.loader.content.CursorLoader;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dto.Instance;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.collect.android.utilities.ApplicationConstants;
@@ -231,13 +233,13 @@ public class InstancesDao {
     }
 
     public Cursor getInstancesCursor(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return Collect.getInstance().getContentResolver()
+        return InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver()
                 .query(InstanceProviderAPI.InstanceColumns.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     public CursorLoader getInstancesCursorLoader(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return new CursorLoader(
-                Collect.getInstance(),
+                InfrastructureProvider.INSTANCE.getApplicationContext(),
                 InstanceProviderAPI.InstanceColumns.CONTENT_URI,
                 projection,
                 selection,
@@ -246,15 +248,15 @@ public class InstancesDao {
     }
 
     public Uri saveInstance(ContentValues values) {
-        return Collect.getInstance().getContentResolver().insert(InstanceProviderAPI.InstanceColumns.CONTENT_URI, values);
+        return InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().insert(InstanceProviderAPI.InstanceColumns.CONTENT_URI, values);
     }
 
     public int updateInstance(ContentValues values, String where, String[] whereArgs) {
-        return Collect.getInstance().getContentResolver().update(InstanceProviderAPI.InstanceColumns.CONTENT_URI, values, where, whereArgs);
+        return InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().update(InstanceProviderAPI.InstanceColumns.CONTENT_URI, values, where, whereArgs);
     }
 
     public void deleteInstancesDatabase() {
-        Collect.getInstance().getContentResolver().delete(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, null);
+       InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().delete(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, null);
     }
 
     public void deleteInstancesFromIDs(List<String> ids) {
@@ -285,7 +287,7 @@ public class InstancesDao {
             counter++;
             count -= selectionArgs.length;
             selection.append(')');
-            Collect.getInstance().getContentResolver()
+           InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver()
                     .delete(InstanceProviderAPI.InstanceColumns.CONTENT_URI,
                             selection.toString(), selectionArgs);
 

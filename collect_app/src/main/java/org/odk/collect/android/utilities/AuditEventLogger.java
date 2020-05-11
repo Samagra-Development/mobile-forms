@@ -7,7 +7,9 @@ import android.os.SystemClock;
 
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.logic.AuditConfig;
 import org.odk.collect.android.logic.AuditEvent;
 import org.odk.collect.android.logic.FormController;
@@ -175,7 +177,7 @@ public class AuditEventLogger {
         }
 
         // Set answers
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         if (aev.getAuditEventType().equals(AuditEvent.AuditEventType.QUESTION) && formController != null) {
             addNewValueToQuestionAuditEvent(aev, formController);
         }
@@ -191,7 +193,7 @@ public class AuditEventLogger {
     enabled and its answer has changed
     */
     private boolean shouldEventBeLogged(AuditEvent aev) {
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         if (aev.getAuditEventType().equals(AuditEvent.AuditEventType.QUESTION) && formController != null) {
             return !formController.indexIsInFieldList(aev.getFormIndex())
                     || (aev.hasNewAnswer() && auditConfig.isTrackingChangesEnabled());

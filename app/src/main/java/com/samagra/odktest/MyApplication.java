@@ -9,7 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.ProcessLifecycleOwner;
+import androidx.multidex.MultiDex;
 
+import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.samagra.ancillaryscreens.AncillaryScreensDriver;
@@ -24,9 +26,12 @@ import com.samagra.odktest.di.component.ApplicationComponent;
 import com.samagra.odktest.di.component.DaggerApplicationComponent;
 import com.samagra.odktest.di.modules.ApplicationModule;
 
-import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.application.CollectInitialisationListener;
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.contracts.ComponentManager;
 import org.odk.collect.android.contracts.FormManagementSectionInteractor;
+
+import java.sql.Time;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -41,7 +46,7 @@ import timber.log.Timber;
  * @author Pranav Sharma
  * @see MainApplication
  */
-public class MyApplication extends Collect implements MainApplication, LifecycleObserver {
+public class MyApplication extends Application implements MainApplication, LifecycleObserver {
 
     protected ApplicationComponent applicationComponent;
 
@@ -59,6 +64,17 @@ public class MyApplication extends Collect implements MainApplication, Lifecycle
      */
     @Override
     public void onCreate() {
+        CollectInitialiser.INSTANCE.init(this, getApplicationContext(), new CollectInitialisationListener() {
+            @Override
+            public void onFailedToStart(@NotNull String message) {
+                Timber.d("Fesv fev e" + "fail");
+            }
+
+            @Override
+            public void onSuccess() {
+                Timber.d("Fesv fev e" + "success");
+            }
+        });
         super.onCreate();
         eventBus = new RxBus();
         setupRemoteConfig();
@@ -69,11 +85,19 @@ public class MyApplication extends Collect implements MainApplication, Lifecycle
         initBus();
     }
 
+
+
     private void initializeFormManagementPackage() {
+
+        edec();
+    }
+
+    private void edec() {
         ComponentManager.registerFormManagementPackage(new FormManagementSectionInteractor());
         FormManagementCommunicator.setContract(ComponentManager.iFormManagementContract);
         ComponentManager.iFormManagementContract.setODKModuleStyle(this, R.drawable.login_bg, R.style.BaseAppTheme,
                 R.style.FormEntryActivityTheme, R.style.BaseAppTheme_SettingsTheme_Dark, Long.MAX_VALUE);
+
     }
 
     private void initBus() {
@@ -114,6 +138,7 @@ public class MyApplication extends Collect implements MainApplication, Lifecycle
                 .applicationModule(new ApplicationModule(this))
                 .build();
         applicationComponent.inject(this);
+        MultiDex.install(this);
     }
 
     public ApplicationComponent getApplicationComponent() {

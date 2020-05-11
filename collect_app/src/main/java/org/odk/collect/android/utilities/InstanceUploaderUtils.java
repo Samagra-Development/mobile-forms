@@ -19,7 +19,10 @@ package org.odk.collect.android.utilities;
 import android.database.Cursor;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 
 import java.util.Map;
@@ -70,7 +73,7 @@ public class InstanceUploaderUtils {
 
     private static String localizeDefaultAggregateSuccessfulText(String text) {
         if (text != null && text.equals(DEFAULT_SUCCESSFUL_TEXT)) {
-            text = Collect.getInstance().getString(R.string.success);
+            text = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.success);
         }
         return text;
     }

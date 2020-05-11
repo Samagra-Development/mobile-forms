@@ -46,7 +46,8 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.exception.ExternalParamsException;
 import org.odk.collect.android.exception.JavaRosaException;
 import org.odk.collect.android.external.ExternalAppsUtils;
@@ -137,7 +138,7 @@ public class ODKView extends FrameLayout implements OnLongClickListener, WidgetV
         }
 
         for (FormEntryPrompt question : questionPrompts) {
-            addWidgetForQuestion(question, readOnlyOverride);
+            addWidgetForQuestion(question, readOnlyOverride, context);
         }
 
         ((NestedScrollView) findViewById(R.id.odk_view_container)).addView(view);
@@ -168,8 +169,8 @@ public class ODKView extends FrameLayout implements OnLongClickListener, WidgetV
      * and adds it to the end of the view. If this widget is not the first one, add a divider above
      * it.
      */
-    private void addWidgetForQuestion(FormEntryPrompt question, boolean readOnlyOverride) {
-        QuestionWidget qw = configureWidgetForQuestion(question, readOnlyOverride);
+    private void addWidgetForQuestion(FormEntryPrompt question, boolean readOnlyOverride, Context context) {
+        QuestionWidget qw = configureWidgetForQuestion(question, readOnlyOverride, context);
 
         widgets.add(qw);
 
@@ -185,13 +186,13 @@ public class ODKView extends FrameLayout implements OnLongClickListener, WidgetV
      * add a divider above it. If the specified {@code index} is beyond the end of the widget list,
      * add it to the end.
      */
-    public void addWidgetForQuestion(FormEntryPrompt question, boolean readOnlyOverride, int index) {
+    public void addWidgetForQuestion(FormEntryPrompt question, boolean readOnlyOverride, int index, Context context) {
         if (index > widgets.size() - 1) {
-            addWidgetForQuestion(question, readOnlyOverride);
+            addWidgetForQuestion(question, readOnlyOverride, context);
             return;
         }
 
-        QuestionWidget qw = configureWidgetForQuestion(question, readOnlyOverride);
+        QuestionWidget qw = configureWidgetForQuestion(question, readOnlyOverride, context);
 
         widgets.add(index, qw);
 
@@ -212,8 +213,8 @@ public class ODKView extends FrameLayout implements OnLongClickListener, WidgetV
      *
      * Note: if the given question is of an unsupported type, a text widget will be created.
      */
-    private QuestionWidget configureWidgetForQuestion(FormEntryPrompt question, boolean readOnlyOverride) {
-        QuestionWidget qw = WidgetFactory.createWidgetFromPrompt(question, getContext(), readOnlyOverride);
+    private QuestionWidget configureWidgetForQuestion(FormEntryPrompt question, boolean readOnlyOverride, Context context) {
+        QuestionWidget qw = WidgetFactory.createWidgetFromPrompt(question, context, readOnlyOverride);
         qw.setOnLongClickListener(this);
         qw.setValueChangedListener(this);
         qw.setId(ViewIds.generateViewId());
@@ -277,7 +278,7 @@ public class ODKView extends FrameLayout implements OnLongClickListener, WidgetV
         if (!path.isEmpty()) {
             TextView tv = new TextView(getContext());
             tv.setText(path);
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Collect.getQuestionFontsize() - 4);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, CollectInitialiser.INSTANCE.getQuestionFontsize() - 4);
             tv.setPadding(0, 0, 0, 5);
             view.addView(tv, layout);
         }
@@ -346,7 +347,7 @@ public class ODKView extends FrameLayout implements OnLongClickListener, WidgetV
         launchIntentButton.setId(ViewIds.generateViewId());
         launchIntentButton.setText(buttonText);
         launchIntentButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
-                Collect.getQuestionFontsize() + 2);
+                CollectInitialiser.INSTANCE.getQuestionFontsize() + 2);
         launchIntentButton.setPadding(20, 20, 20, 20);
         launchIntentButton.setLayoutParams(params);
 
@@ -455,7 +456,7 @@ public class ODKView extends FrameLayout implements OnLongClickListener, WidgetV
         if (bundle == null) {
             return;
         }
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         Set<String> keys = bundle.keySet();
         for (String key : keys) {
             for (QuestionWidget questionWidget : widgets) {

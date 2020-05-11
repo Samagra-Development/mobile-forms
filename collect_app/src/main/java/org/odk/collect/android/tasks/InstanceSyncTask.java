@@ -23,7 +23,9 @@ import android.provider.BaseColumns;
 
 import org.apache.commons.io.FileUtils;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.exception.EncryptionException;
@@ -78,12 +80,12 @@ public class InstanceSyncTask extends AsyncTask<Void, String, String> {
 
         try {
             List<String> candidateInstances = new LinkedList<String>();
-            File instancesPath = new File(Collect.INSTANCES_PATH);
+            File instancesPath = new File(CollectInitialiser.INSTANCE.getINSTANCES_PATH());
             if (instancesPath.exists() && instancesPath.isDirectory()) {
                 File[] instanceFolders = instancesPath.listFiles();
                 if (instanceFolders == null || instanceFolders.length == 0) {
                     Timber.i("[%d] Empty instance folder. Stopping scan process.", instance);
-                    Timber.d(Collect.getInstance().getString(R.string.instance_scan_completed));
+                    Timber.d(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.instance_scan_completed));
                     return currentStatus;
                 }
 
@@ -141,7 +143,7 @@ public class InstanceSyncTask extends AsyncTask<Void, String, String> {
                 instancesDao.deleteInstancesFromIDs(filesToRemove);
 
                 final boolean instanceSyncFlag = PreferenceManager.getDefaultSharedPreferences(
-                        Collect.getInstance().getApplicationContext()).getBoolean(
+                        InfrastructureProvider.INSTANCE.getApplicationContext()).getBoolean(
                         GeneralKeys.KEY_INSTANCE_SYNC, true);
 
                 int counter = 0;
@@ -195,7 +197,7 @@ public class InstanceSyncTask extends AsyncTask<Void, String, String> {
                 }
                 if (counter > 0) {
                     currentStatus += String.format(
-                            Collect.getInstance().getString(R.string.instance_scan_count),
+                            InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.instance_scan_count),
                             counter);
                 }
             }

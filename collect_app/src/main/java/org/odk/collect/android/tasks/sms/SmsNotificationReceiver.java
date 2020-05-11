@@ -10,7 +10,9 @@ import androidx.core.app.NotificationManagerCompat;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.InstanceUploaderListActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.tasks.sms.contracts.SmsSubmissionManagerContract;
 import org.odk.collect.android.tasks.sms.models.SmsProgress;
 import org.odk.collect.android.tasks.sms.models.SmsSubmission;
@@ -40,7 +42,7 @@ public class SmsNotificationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Collect.getInstance().getComponent().inject(this);
+        CollectInitialiser.INSTANCE.getComponent().inject(this);
 
         this.context = context;
 

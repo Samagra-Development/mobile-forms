@@ -37,7 +37,9 @@ import org.odk.collect.android.BackgroundRxCalls.UnzipDataTask;
 import org.odk.collect.android.BackgroundRxCalls.WebCalls;
 import org.odk.collect.android.ODKDriver;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.listeners.PermissionListener;
 import org.odk.collect.android.preferences.GeneralKeys;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
@@ -73,7 +75,7 @@ public class SplashScreenActivity extends Activity {
             public void granted() {
                 // must be at the beginning of any activity that can be called from an external intent
                 try {
-                    Collect.createODKDirs();
+                    CollectInitialiser.INSTANCE.createODKDirs();
                 } catch (RuntimeException e) {
                     DialogUtils.showDialog(DialogUtils.createErrorDialog(SplashScreenActivity.this,
                             e.getMessage(), EXIT), SplashScreenActivity.this);

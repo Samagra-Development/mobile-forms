@@ -20,7 +20,9 @@ import android.content.ContextWrapper;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 
 import java.io.File;
 
@@ -29,7 +31,7 @@ public class DatabaseContext extends ContextWrapper {
     private final String path;
 
     public DatabaseContext(String path) {
-        super(Collect.getInstance());
+        super(InfrastructureProvider.INSTANCE.getApplicationContext());
         this.path = path;
     }
 

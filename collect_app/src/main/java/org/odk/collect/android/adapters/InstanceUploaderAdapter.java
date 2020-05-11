@@ -13,7 +13,9 @@ import android.widget.TextView;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.R2;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.events.RxEventBus;
 import org.odk.collect.android.events.SmsRxEvent;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
@@ -55,7 +57,7 @@ public class InstanceUploaderAdapter extends CursorAdapter {
     public InstanceUploaderAdapter(Context context, Cursor cursor) {
         super(context, cursor);
         this.context = context;
-        Collect.getInstance().getComponent().inject(this);
+        CollectInitialiser.INSTANCE.getComponent().inject(this);
         compositeDisposable = new CompositeDisposable();
     }
 

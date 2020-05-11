@@ -39,7 +39,11 @@ import androidx.lifecycle.ViewModelProviders;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.viewmodels.FormDownloadListViewModel;
 import org.odk.collect.android.adapters.FormDownloadListAdapter;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.http.HttpCredentialsInterface;
 import org.odk.collect.android.injection.DaggerUtils;
@@ -142,7 +146,7 @@ public class FormDownloadList extends FormListActivity implements FormListDownlo
             public void granted() {
                 // must be at the beginning of any activity that can be called from an external intent
                 try {
-                    Collect.createODKDirs();
+                    CollectInitialiser.INSTANCE.createODKDirs();
                 } catch (RuntimeException e) {
                     DialogUtils.showDialog(DialogUtils.createErrorDialog(FormDownloadList.this, e.getMessage(), EXIT), FormDownloadList.this);
                     return;
@@ -759,7 +763,7 @@ public class FormDownloadList extends FormListActivity implements FormListDownlo
         if (viewModel.isDownloadOnlyMode()) {
             for (FormDetails formDetails: result.keySet()) {
                 String successKey = result.get(formDetails);
-                if (Collect.getInstance().getString(R.string.success).equals(successKey)) {
+                if (InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.success).equals(successKey)) {
                     if (viewModel.getFormResults().containsKey(formDetails.getFormID())) {
                         viewModel.putFormResult(formDetails.getFormID(), true);
                     }
@@ -776,7 +780,7 @@ public class FormDownloadList extends FormListActivity implements FormListDownlo
         for (FormDetails k : keys) {
             b.append(k.getFormName() + " ("
                     + ((k.getFormVersion() != null)
-                    ? (Collect.getInstance().getString(R.string.version) + ": " + k.getFormVersion() + " ")
+                    ? (InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.version) + ": " + k.getFormVersion() + " ")
                     : "") + "ID: " + k.getFormID() + ") - " + result.get(k));
             b.append("\n\n");
         }

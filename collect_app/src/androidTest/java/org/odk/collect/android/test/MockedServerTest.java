@@ -8,7 +8,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.preferences.GeneralKeys;
 
 import okhttp3.mockwebserver.MockResponse;
@@ -82,7 +84,7 @@ public abstract class MockedServerTest {
     }
 
     private static void configAppFor(MockWebServer server) {
-        Editor prefs = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance().getBaseContext()).edit();
+        Editor prefs = PreferenceManager.getDefaultSharedPreferences(CollectInitialiser.INSTANCE.getBaseContext()).edit();
         prefs.putString(GeneralKeys.KEY_SERVER_URL, server.url("/").toString());
         if (!prefs.commit()) {
             throw new RuntimeException("Failed to set up SharedPreferences for MockWebServer");

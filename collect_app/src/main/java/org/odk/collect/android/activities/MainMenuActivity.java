@@ -45,7 +45,11 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.preferences.AdminKeys;
 import org.odk.collect.android.preferences.AdminPreferencesActivity;
@@ -124,7 +128,7 @@ public class MainMenuActivity extends CollectAbstractActivity {
         enterDataButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Collect.allowClick(getClass().getName())) {
+                if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
                     Intent i = new Intent(getApplicationContext(),
                             FormChooserList.class);
                     startActivity(i);
@@ -138,7 +142,7 @@ public class MainMenuActivity extends CollectAbstractActivity {
         reviewDataButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Collect.allowClick(getClass().getName())) {
+                if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
                     Intent i = new Intent(getApplicationContext(), InstanceChooserList.class);
                     i.putExtra(ApplicationConstants.BundleKeys.FORM_MODE,
                             ApplicationConstants.FormModes.EDIT_SAVED);
@@ -153,7 +157,7 @@ public class MainMenuActivity extends CollectAbstractActivity {
         sendDataButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Collect.allowClick(getClass().getName())) {
+                if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
                     Intent i = new Intent(getApplicationContext(),
                             InstanceUploaderListActivity.class);
                     startActivity(i);
@@ -166,7 +170,7 @@ public class MainMenuActivity extends CollectAbstractActivity {
         viewSentFormsButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Collect.allowClick(getClass().getName())) {
+                if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
                     Intent i = new Intent(getApplicationContext(), InstanceChooserList.class);
                     i.putExtra(ApplicationConstants.BundleKeys.FORM_MODE,
                             ApplicationConstants.FormModes.VIEW_SENT);
@@ -181,7 +185,7 @@ public class MainMenuActivity extends CollectAbstractActivity {
         getFormsButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Collect.allowClick(getClass().getName())) {
+                if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
                     SharedPreferences sharedPreferences = PreferenceManager
                             .getDefaultSharedPreferences(MainMenuActivity.this);
                     String protocol = sharedPreferences.getString(
@@ -210,7 +214,7 @@ public class MainMenuActivity extends CollectAbstractActivity {
         manageFilesButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Collect.allowClick(getClass().getName())) {
+                if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
                     Intent i = new Intent(getApplicationContext(),
                             FileManagerTabs.class);
                     startActivity(i);
@@ -222,7 +226,7 @@ public class MainMenuActivity extends CollectAbstractActivity {
         // external intent
         Timber.i("Starting up, creating directories");
         try {
-            Collect.createODKDirs();
+            CollectInitialiser.INSTANCE.createODKDirs();
         } catch (RuntimeException e) {
             createErrorDialog(e.getMessage(), EXIT);
             return;
@@ -231,12 +235,12 @@ public class MainMenuActivity extends CollectAbstractActivity {
         {
             // dynamically construct the "ODK Collect vA.B" string
             TextView mainMenuMessageLabel = findViewById(R.id.main_menu_header);
-            mainMenuMessageLabel.setText(Collect.getInstance()
+            mainMenuMessageLabel.setText(CollectInitialiser.INSTANCE
                     .getVersionedAppName());
         }
 
-        File f = new File(Collect.ODK_ROOT + "/collect.settings");
-        File j = new File(Collect.ODK_ROOT + "/collect.settings.json");
+        File f = new File(CollectInitialiser.INSTANCE.getODK_ROOT() + "/CollectInitialiser.INSTANCE.getSETTINGS()");
+        File j = new File(CollectInitialiser.INSTANCE.getODK_ROOT() + "/CollectInitialiser.INSTANCE.getSETTINGS().json");
         // Give JSON file preference
         if (j.exists()) {
             boolean success = SharedPreferencesUtils.loadSharedPreferencesFromJSONFile(j);
@@ -385,7 +389,7 @@ public class MainMenuActivity extends CollectAbstractActivity {
             }
         }
 
-        ((Collect) getApplication())
+       InfrastructureProvider.INSTANCE
                 .getDefaultTracker()
                 .enableAutoActivityTracking(true);
     }
@@ -509,8 +513,7 @@ public class MainMenuActivity extends CollectAbstractActivity {
 
     // This flag must be set each time the app starts up
     private void setupGoogleAnalytics() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(Collect
-                .getInstance());
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(InfrastructureProvider.INSTANCE.getApplicationContext());
         boolean isAnalyticsEnabled = settings.getBoolean(GeneralKeys.KEY_ANALYTICS, true);
         GoogleAnalytics googleAnalytics = GoogleAnalytics.getInstance(getApplicationContext());
         googleAnalytics.setAppOptOut(!isAnalyticsEnabled);
@@ -587,7 +590,7 @@ public class MainMenuActivity extends CollectAbstractActivity {
             for (Entry<String, ?> entry : adminEntries.entrySet()) {
                 AdminSharedPreferences.getInstance().save(entry.getKey(), entry.getValue());
             }
-            Collect.getInstance().initProperties();
+            CollectInitialiser.INSTANCE.initProperties();
             res = true;
         } catch (IOException | ClassNotFoundException e) {
             Timber.e(e, "Exception while loading preferences from file due to : %s ", e.getMessage());

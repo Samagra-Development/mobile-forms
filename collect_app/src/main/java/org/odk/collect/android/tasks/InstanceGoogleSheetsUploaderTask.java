@@ -17,7 +17,11 @@ package org.odk.collect.android.tasks;
 import android.database.Cursor;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dto.Form;
 import org.odk.collect.android.dto.Instance;
@@ -52,7 +56,7 @@ public class InstanceGoogleSheetsUploaderTask extends InstanceUploaderTask {
 
             if (isCancelled()) {
                 outcome.messagesByInstanceId.put(instance.getDatabaseId().toString(),
-                        Collect.getInstance().getString(R.string.instance_upload_cancelled));
+                        InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.instance_upload_cancelled));
                 return outcome;
             }
 
@@ -65,7 +69,7 @@ public class InstanceGoogleSheetsUploaderTask extends InstanceUploaderTask {
 
             if (forms.size() != 1) {
                 outcome.messagesByInstanceId.put(instance.getDatabaseId().toString(),
-                        Collect.getInstance().getString(R.string.not_exactly_one_blank_form_for_this_form_id));
+                        InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.not_exactly_one_blank_form_for_this_form_id));
             } else {
                 try {
                     String destinationUrl = uploader.getUrlToSubmitTo(instance, null, null);
@@ -73,7 +77,7 @@ public class InstanceGoogleSheetsUploaderTask extends InstanceUploaderTask {
                         uploader.uploadOneSubmission(instance, destinationUrl);
                         outcome.messagesByInstanceId.put(instance.getDatabaseId().toString(), DEFAULT_SUCCESSFUL_TEXT);
 
-                        Collect.getInstance().logRemoteAnalytics("Submission", "HTTP-Sheets", Collect.getFormIdentifierHash(instance.getJrFormId(), instance.getJrVersion()));
+                        CollectInitialiser.INSTANCE.logRemoteAnalytics("Submission", "HTTP-Sheets", CollectInitialiser.INSTANCE.getFormIdentifierHash(instance.getJrFormId(), instance.getJrVersion()));
                     } else {
                         outcome.messagesByInstanceId.put(instance.getDatabaseId().toString(), SPREADSHEET_UPLOADED_TO_GOOGLE_DRIVE);
                     }

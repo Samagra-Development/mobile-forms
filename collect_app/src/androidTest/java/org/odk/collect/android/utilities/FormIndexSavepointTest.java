@@ -21,7 +21,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.tasks.SaveFormIndexTask;
 import org.odk.collect.android.tasks.SaveToDiskTask;
@@ -44,9 +46,9 @@ public class FormIndexSavepointTest {
         String instanceName = "test.xml";
 
         // for loadFormIndexFromFile
-        File instancePath = new File(Collect.INSTANCES_PATH + File.separator + instanceName);
+        File instancePath = new File(CollectInitialiser.INSTANCE.getINSTANCES_PATH() + File.separator + instanceName);
         when(formController.getInstanceFile()).thenReturn(instancePath);
-        Collect.getInstance().setFormController(formController);
+        CollectInitialiser.INSTANCE.setFormController(formController);
 
         FormIndex originalFormIndex = FormIndex.createBeginningOfFormIndex();
         File indexFile = SaveToDiskTask.getFormIndexFile(instanceName);

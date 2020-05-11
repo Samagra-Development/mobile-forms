@@ -21,7 +21,9 @@ import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.webkit.MimeTypeMap;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.logic.FormInfo;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI;
@@ -33,7 +35,7 @@ public final class ContentResolverHelper {
     }
 
     private static ContentResolver getContentResolver() {
-        return Collect.getInstance().getContentResolver();
+        return InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver();
     }
 
     public static FormInfo getFormDetails(Uri uri) {

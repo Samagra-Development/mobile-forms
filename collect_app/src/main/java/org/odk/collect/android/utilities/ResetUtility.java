@@ -18,7 +18,9 @@ package org.odk.collect.android.utilities;
 
 import android.content.Context;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.database.ItemsetDbAdapter;
@@ -51,12 +53,12 @@ public class ResetUtility {
                     resetForms();
                     break;
                 case ResetAction.RESET_LAYERS:
-                    if (deleteFolderContents(Collect.OFFLINE_LAYERS)) {
+                    if (deleteFolderContents(CollectInitialiser.INSTANCE.getOFFLINE_LAYERS())) {
                         failedResetActions.remove(failedResetActions.indexOf(ResetAction.RESET_LAYERS));
                     }
                     break;
                 case ResetAction.RESET_CACHE:
-                    if (deleteFolderContents(Collect.CACHE_PATH)) {
+                    if (deleteFolderContents(CollectInitialiser.INSTANCE.getCACHE_PATH())) {
                         failedResetActions.remove(failedResetActions.indexOf(ResetAction.RESET_CACHE));
                     }
                     break;
@@ -75,11 +77,11 @@ public class ResetUtility {
         GeneralSharedPreferences.getInstance().loadDefaultPreferences();
         AdminSharedPreferences.getInstance().loadDefaultPreferences();
 
-        boolean deletedSettingsFolderContest = !new File(Collect.SETTINGS).exists()
-                || deleteFolderContents(Collect.SETTINGS);
+        boolean deletedSettingsFolderContest = !new File(CollectInitialiser.INSTANCE.getSETTINGS()).exists()
+                || deleteFolderContents(CollectInitialiser.INSTANCE.getSETTINGS());
 
-        boolean deletedSettingsFile = !new File(Collect.ODK_ROOT + "/collect.settings").exists()
-                || (new File(Collect.ODK_ROOT + "/collect.settings").delete());
+        boolean deletedSettingsFile = !new File(CollectInitialiser.INSTANCE.getODK_ROOT() + "/CollectInitialiser.INSTANCE.getSETTINGS()").exists()
+                || (new File(CollectInitialiser.INSTANCE.getODK_ROOT() + "/CollectInitialiser.INSTANCE.getSETTINGS()").delete());
         
         new LocaleHelper().updateLocale(context);
 
@@ -87,13 +89,13 @@ public class ResetUtility {
             failedResetActions.remove(failedResetActions.indexOf(ResetAction.RESET_PREFERENCES));
         }
 
-        Collect.getInstance().initProperties();
+        CollectInitialiser.INSTANCE.initProperties();
     }
 
     private void resetInstances() {
         new InstancesDao().deleteInstancesDatabase();
 
-        if (deleteFolderContents(Collect.INSTANCES_PATH)) {
+        if (deleteFolderContents(CollectInitialiser.INSTANCE.getINSTANCES_PATH())) {
             failedResetActions.remove(failedResetActions.indexOf(ResetAction.RESET_INSTANCES));
         }
     }
@@ -101,9 +103,9 @@ public class ResetUtility {
     private void resetForms() {
         new FormsDao().deleteFormsDatabase();
 
-        File itemsetDbFile = new File(Collect.METADATA_PATH + File.separator + ItemsetDbAdapter.DATABASE_NAME);
+        File itemsetDbFile = new File(CollectInitialiser.INSTANCE.getMETADATA_PATH() + File.separator + ItemsetDbAdapter.DATABASE_NAME);
 
-        if (deleteFolderContents(Collect.FORMS_PATH) && (!itemsetDbFile.exists() || itemsetDbFile.delete())) {
+        if (deleteFolderContents(CollectInitialiser.INSTANCE.getFORMS_PATH()) && (!itemsetDbFile.exists() || itemsetDbFile.delete())) {
             failedResetActions.remove(failedResetActions.indexOf(ResetAction.RESET_FORMS));
         }
     }

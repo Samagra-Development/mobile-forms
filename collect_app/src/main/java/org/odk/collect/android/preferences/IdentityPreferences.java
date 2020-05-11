@@ -22,7 +22,10 @@ import android.view.View;
 import com.google.android.gms.analytics.GoogleAnalytics;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
 
 import static org.odk.collect.android.preferences.GeneralKeys.KEY_ANALYTICS;
 import static org.odk.collect.android.preferences.PreferencesActivity.INTENT_KEY_ADMIN_MODE;
@@ -77,7 +80,7 @@ public class IdentityPreferences extends BasePreferenceFragment {
                 GoogleAnalytics googleAnalytics = GoogleAnalytics.getInstance(getActivity().getApplicationContext());
                 googleAnalytics.setAppOptOut(!analyticsPreference.isChecked());
 
-                Collect.getInstance().setAnalyticsCollectionEnabled(analyticsPreference.isChecked());
+                CollectInitialiser.INSTANCE.setAnalyticsCollectionEnabled(analyticsPreference.isChecked());
                 return true;
             });
         }

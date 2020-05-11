@@ -39,7 +39,9 @@ import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.external.ExternalSelectChoice;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.FormEntryPromptUtils;
@@ -123,7 +125,7 @@ public abstract class AbstractSelectListAdapter extends RecyclerView.Adapter<Abs
     abstract CompoundButton setUpButton(int index);
 
     void adjustButton(TextView button, int index) {
-        button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Collect.getQuestionFontsize());
+        button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, CollectInitialiser.INSTANCE.getQuestionFontsize());
         button.setText(FormEntryPromptUtils.getItemText(widget.getFormEntryPrompt(), filteredItems.get(index)));
         button.setTag(items.indexOf(filteredItems.get(index)));
         button.setGravity(isRTL() ? Gravity.END : Gravity.START);

@@ -27,7 +27,11 @@ import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.database.helpers.InstancesDatabaseHelper;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.utilities.MediaUtils;
@@ -56,7 +60,7 @@ public class InstanceProvider extends ContentProvider {
     private synchronized InstancesDatabaseHelper getDbHelper() {
         // wrapper to test and reset/set the dbHelper based upon the attachment state of the device.
         try {
-            Collect.createODKDirs();
+            CollectInitialiser.INSTANCE.createODKDirs();
         } catch (RuntimeException e) {
             return null;
         }
@@ -213,7 +217,7 @@ public class InstanceProvider extends ContentProvider {
             // ODK Tables instance data directory. Let ODK Tables
             // manage the lifetimes of its filled-in form data
             // media attachments.
-            if (directory.isDirectory() && !Collect.isODKTablesInstanceDataDirectory(directory)) {
+            if (directory.isDirectory() && !CollectInitialiser.INSTANCE.isODKTablesInstanceDataDirectory(directory)) {
                 // delete any media entries for files in this directory...
                 int images = MediaUtils.deleteImagesInFolderFromMediaProvider(directory);
                 int audio = MediaUtils.deleteAudioInFolderFromMediaProvider(directory);
@@ -301,7 +305,7 @@ public class InstanceProvider extends ContentProvider {
                     if (status != null && status.equals(InstanceProviderAPI.STATUS_SUBMITTED)) {
                         ContentValues cv = new ContentValues();
                         cv.put(InstanceColumns.DELETED_DATE, System.currentTimeMillis());
-                        count = Collect.getInstance().getContentResolver().update(uri, cv, null, null);
+                        count = InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().update(uri, cv, null, null);
                     } else {
                         String[] newWhereArgs;
                         if (whereArgs == null || whereArgs.length == 0) {

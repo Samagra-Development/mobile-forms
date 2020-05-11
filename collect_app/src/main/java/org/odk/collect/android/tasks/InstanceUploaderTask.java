@@ -21,7 +21,9 @@ import android.database.SQLException;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.listeners.InstanceUploaderListener;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
@@ -109,7 +111,7 @@ public abstract class InstanceUploaderTask extends AsyncTask<Long, Integer, Inst
                                 }
 
                                 DeleteInstancesTask dit = new DeleteInstancesTask();
-                                dit.setContentResolver(Collect.getInstance().getContentResolver());
+                                dit.setContentResolver(InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver());
                                 dit.execute(toDelete.toArray(new Long[toDelete.size()]));
                             }
                         } catch (SQLException e) {

@@ -34,7 +34,10 @@ import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.preferences.GeneralKeys;
 import org.odk.collect.android.utilities.ToastUtils;
 import org.osmdroid.tileprovider.IRegisterReceiver;
@@ -208,7 +211,7 @@ public class MapHelper {
     }
 
     private static String[] getOfflineLayerList() {
-        File[] files = new File(Collect.OFFLINE_LAYERS).listFiles();
+        File[] files = new File(CollectInitialiser.INSTANCE.getOFFLINE_LAYERS()).listFiles();
         ArrayList<String> results = new ArrayList<>();
         results.add(NO_FOLDER_KEY);
         if (files != null) {
@@ -222,7 +225,7 @@ public class MapHelper {
     }
 
     public static String[] getOfflineLayerListWithTags() {
-        File[] files = new File(Collect.OFFLINE_LAYERS).listFiles();
+        File[] files = new File(CollectInitialiser.INSTANCE.getOFFLINE_LAYERS()).listFiles();
         ArrayList<String> layerNames = new ArrayList<>();
         if (files != null) {
             for (File f : files) {
@@ -314,7 +317,7 @@ public class MapHelper {
     }
 
     private File[] getFileFromSelectedItem(int item) {
-        File directory = new File(Collect.OFFLINE_LAYERS + SLASH + offilineOverlays[item]);
+        File directory = new File(CollectInitialiser.INSTANCE.getOFFLINE_LAYERS() + SLASH + offilineOverlays[item]);
         return directory.listFiles((dir, filename) -> filename.toLowerCase(Locale.US).endsWith(".mbtiles"));
     }
 
@@ -341,7 +344,7 @@ public class MapHelper {
     /**
      * If the current basemap is an offline layer, returns the index (1-x) of the offline
      * layer's filename in the list of all the filenames ending in ".mbtiles" in the
-     * Collect.OFFLINE_LAYERS directory, otherwise returns 0 (None).
+     * CollectInitialiser.INSTANCE.getOFFLINE_LAYERS() directory, otherwise returns 0 (None).
      */
     public int getSelectedLayer() {
         return selectedLayer;

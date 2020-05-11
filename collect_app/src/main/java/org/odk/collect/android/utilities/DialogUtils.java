@@ -28,7 +28,9 @@ import android.widget.ListView;
 
 import org.odk.collect.android.R;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.logic.AuditEvent;
 import org.odk.collect.android.logic.FormController;
 import timber.log.Timber;
@@ -88,7 +90,7 @@ public final class DialogUtils {
      * Shows a confirm/cancel dialog for deleting the current repeat group.
      */
     public static void showDeleteRepeatConfirmDialog(Context context, Runnable onDeleted, Runnable onCanceled) {
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         String name = formController.getLastRepeatedGroupName();
         int repeatcount = formController.getLastRepeatedGroupRepeatCount();
         if (repeatcount != -1) {

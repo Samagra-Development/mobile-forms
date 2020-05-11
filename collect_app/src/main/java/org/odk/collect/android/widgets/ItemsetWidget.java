@@ -30,7 +30,9 @@ import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.database.ItemsetDbAdapter;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.utilities.FileUtil;
@@ -90,7 +92,7 @@ public class ItemsetWidget extends AbstractSelectOneWidget {
         List<String> arguments = new ArrayList<>();
         String selectionString = getSelectionStringAndPopulateArguments(getQueryString(nodesetString), arguments);
 
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         String[] selectionArgs = getSelectionArgs(arguments, nodesetString, formController);
 
         return selectionArgs == null ? null : getItemsFromDatabase(selectionString, selectionArgs, formController);

@@ -31,7 +31,9 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.xform.util.XFormUtils;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dto.Form;
 import org.odk.collect.android.dto.Instance;
@@ -86,7 +88,7 @@ public class InstanceGoogleSheetsUploader extends InstanceUploader {
     public String uploadOneSubmission(Instance instance, String spreadsheetUrl) throws UploadException {
         if (new FormsDao().isFormEncrypted(instance.getJrFormId(), instance.getJrVersion())) {
             saveFailedStatusToDatabase(instance);
-            throw new UploadException(Collect.getInstance().getString(R.string.google_sheets_encrypted_message));
+            throw new UploadException(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.google_sheets_encrypted_message));
         }
 
         File instanceFile = new File(instance.getInstanceFilePath());
@@ -101,7 +103,7 @@ public class InstanceGoogleSheetsUploader extends InstanceUploader {
 
         try {
             if (forms.size() != 1) {
-                throw new UploadException(Collect.getInstance().getString(R.string.not_exactly_one_blank_form_for_this_form_id));
+                throw new UploadException(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.not_exactly_one_blank_form_for_this_form_id));
             }
             Form form = forms.get(0);
             String formFilePath = form.getFormFilePath();
@@ -134,7 +136,7 @@ public class InstanceGoogleSheetsUploader extends InstanceUploader {
         if (e.getDetails() != null) {
             switch (e.getDetails().getCode()) {
                 case 403 :
-                    message = Collect.getInstance().getString(R.string.google_sheets_access_denied);
+                    message = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.google_sheets_access_denied);
                     break;
                 case 429 :
                     message = FAIL + "Too many requests per 100 seconds";
@@ -256,7 +258,7 @@ public class InstanceGoogleSheetsUploader extends InstanceUploader {
         File toUpload = new File(filePath);
 
         if (!new File(filePath).exists()) {
-            throw new UploadException(Collect.getInstance()
+            throw new UploadException(InfrastructureProvider.INSTANCE.getApplicationContext()
                     .getString(R.string.media_upload_error, filePath));
         }
 
@@ -445,7 +447,7 @@ public class InstanceGoogleSheetsUploader extends InstanceUploader {
     private void disallowMissingColumns(List<Object> columnHeaders, List<Object> columnTitles) throws UploadException {
         for (Object columnTitle : columnTitles) {
             if (!columnHeaders.contains(columnTitle)) {
-                throw new UploadException(Collect.getInstance().getString(R.string.google_sheets_missing_columns, columnTitle));
+                throw new UploadException(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.google_sheets_missing_columns, columnTitle));
             }
         }
     }
@@ -553,7 +555,7 @@ public class InstanceGoogleSheetsUploader extends InstanceUploader {
 
     private void ensureNumberOfColumnsIsValid(int numberOfColumns) throws UploadException {
         if (numberOfColumns == 0) {
-            throw new UploadException(Collect.getInstance().getString(R.string.no_columns_to_upload));
+            throw new UploadException(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.no_columns_to_upload));
         }
     }
 

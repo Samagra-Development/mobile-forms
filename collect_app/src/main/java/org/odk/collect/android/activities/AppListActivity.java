@@ -40,7 +40,9 @@ import android.widget.ProgressBar;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.SortDialogAdapter;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.listeners.RecyclerViewClickListener;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.collect.android.utilities.SnackbarUtils;
@@ -276,7 +278,7 @@ abstract class AppListActivity extends CollectAbstractActivity {
 
     private void saveSelectedSortingOrder(int selectedStringOrder) {
         selectedSortingOrder = selectedStringOrder;
-        PreferenceManager.getDefaultSharedPreferences(Collect.getInstance())
+        PreferenceManager.getDefaultSharedPreferences(InfrastructureProvider.INSTANCE.getApplicationContext())
                 .edit()
                 .putInt(getSortingOrderKey(), selectedStringOrder)
                 .apply();
@@ -284,7 +286,7 @@ abstract class AppListActivity extends CollectAbstractActivity {
 
     protected void restoreSelectedSortingOrder() {
         selectedSortingOrder = PreferenceManager
-                .getDefaultSharedPreferences(Collect.getInstance())
+                .getDefaultSharedPreferences(InfrastructureProvider.INSTANCE.getApplicationContext())
                 .getInt(getSortingOrderKey(), BY_NAME_ASC);
     }
 

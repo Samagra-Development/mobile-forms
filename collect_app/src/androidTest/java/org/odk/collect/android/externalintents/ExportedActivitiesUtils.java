@@ -6,12 +6,12 @@ import java.io.File;
 
 import timber.log.Timber;
 
-import static org.odk.collect.android.application.Collect.CACHE_PATH;
-import static org.odk.collect.android.application.Collect.FORMS_PATH;
-import static org.odk.collect.android.application.Collect.INSTANCES_PATH;
-import static org.odk.collect.android.application.Collect.METADATA_PATH;
-import static org.odk.collect.android.application.Collect.ODK_ROOT;
-import static org.odk.collect.android.application.Collect.OFFLINE_LAYERS;
+import static org.odk.collect.android.application.CollectInitialiser.INSTANCE.getCACHE_PATH();
+import static org.odk.collect.android.application.CollectInitialiser.INSTANCE.getFORMS_PATH();
+import static org.odk.collect.android.application.CollectInitialiser.INSTANCE.getINSTANCES_PATH();
+import static org.odk.collect.android.application.CollectInitialiser.INSTANCE.getMETADATA_PATH();
+import static org.odk.collect.android.application.CollectInitialiser.INSTANCE.getODK_ROOT();
+import static org.odk.collect.android.application.CollectInitialiser.INSTANCE.getOFFLINE_LAYERS();
 
 class ExportedActivitiesUtils {
 

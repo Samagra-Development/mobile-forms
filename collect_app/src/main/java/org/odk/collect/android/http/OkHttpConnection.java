@@ -16,7 +16,9 @@ import com.burgstaller.okhttp.digest.DigestAuthenticator;
 import org.apache.commons.io.IOUtils;
 import org.odk.collect.android.BuildConfig;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.utilities.FileUtils;
 
 import java.io.ByteArrayInputStream;
@@ -111,8 +113,7 @@ public class OkHttpConnection implements OpenRosaHttpInterface {
 
         if (statusCode != HttpURLConnection.HTTP_OK) {
             discardEntityBytes(response);
-            String errMsg = Collect
-                    .getInstance()
+            String errMsg = InfrastructureProvider.INSTANCE.getApplicationContext()
                     .getString(R.string.file_fetch_failed, uri.toString(), response.message(), String.valueOf(statusCode));
 
             Timber.e(errMsg);

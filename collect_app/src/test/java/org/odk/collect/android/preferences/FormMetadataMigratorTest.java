@@ -7,7 +7,9 @@ import android.preference.PreferenceManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.robolectric.RobolectricTestRunner;
 
 import java.io.PrintStream;
@@ -59,7 +61,7 @@ public class FormMetadataMigratorTest {
 
     @Before
     public void setUp() throws Exception {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(InfrastructureProvider.INSTANCE.getApplicationContext());
     }
 
     @Test

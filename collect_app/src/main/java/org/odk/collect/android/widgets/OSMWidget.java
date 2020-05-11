@@ -21,7 +21,9 @@ import org.javarosa.core.model.osm.OSMTag;
 import org.javarosa.core.model.osm.OSMTagItem;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.http.CollectServerClient;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.utilities.FileUtils;
@@ -61,7 +63,7 @@ public class OSMWidget extends QuestionWidget implements BinaryWidget {
     public OSMWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
 
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
 
         formFileName = FileUtils.getFormBasenameFromMediaFolder(formController.getMediaFolder());
 

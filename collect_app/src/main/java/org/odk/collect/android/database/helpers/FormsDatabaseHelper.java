@@ -20,7 +20,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.database.DatabaseContext;
 import org.odk.collect.android.utilities.CustomSQLiteQueryBuilder;
 
@@ -58,7 +60,7 @@ public class FormsDatabaseHelper extends SQLiteOpenHelper {
     private static final String MODEL_VERSION = "modelVersion";
 
     public FormsDatabaseHelper() {
-        super(new DatabaseContext(Collect.METADATA_PATH), DATABASE_NAME, null, DATABASE_VERSION);
+        super(new DatabaseContext(CollectInitialiser.INSTANCE.getMETADATA_PATH()), DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override

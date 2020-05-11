@@ -21,7 +21,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.listeners.DiskSyncListener;
 import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
@@ -62,7 +66,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
             // Process everything then report what didn't work.
             StringBuilder errors = new StringBuilder();
 
-            File formDir = new File(Collect.FORMS_PATH);
+            File formDir = new File(CollectInitialiser.INSTANCE.getFORMS_PATH());
             if (formDir.exists() && formDir.isDirectory()) {
                 // Get all the files in the /odk/foms directory
                 List<File> formsToAdd = new LinkedList<File>();
@@ -166,7 +170,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
 
                     // update in content provider
                     int count =
-                            Collect.getInstance().getContentResolver()
+                           InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver()
                                     .update(updateUri, values, null, null);
                     Timber.i("[%d] %d records successfully updated", instance, count);
                 }
@@ -215,7 +219,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
             if (errors.length() != 0) {
                 statusMessage = errors.toString();
             } else {
-                Timber.d(Collect.getInstance().getString(R.string.finished_disk_scan));
+                Timber.d(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.finished_disk_scan));
             }
             return statusMessage;
         } finally {
@@ -269,7 +273,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
             updateValues.put(FormsColumns.DISPLAY_NAME, title);
         } else {
             throw new IllegalArgumentException(
-                    Collect.getInstance().getString(R.string.xform_parse_error,
+                    InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.xform_parse_error,
                             formDefFile.getName(), "title"));
         }
         String formid = fields.get(FileUtils.FORMID);
@@ -277,7 +281,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
             updateValues.put(FormsColumns.JR_FORM_ID, formid);
         } else {
             throw new IllegalArgumentException(
-                    Collect.getInstance().getString(R.string.xform_parse_error,
+                    InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.xform_parse_error,
                             formDefFile.getName(), "id"));
         }
         String version = fields.get(FileUtils.VERSION);
@@ -290,7 +294,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
                 updateValues.put(FormsColumns.SUBMISSION_URI, submission);
             } else {
                 throw new IllegalArgumentException(
-                        Collect.getInstance().getString(R.string.xform_parse_error,
+                        InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.xform_parse_error,
                                 formDefFile.getName(), "submission url"));
             }
         }

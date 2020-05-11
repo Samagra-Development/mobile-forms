@@ -25,7 +25,9 @@ import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.view.Surface;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -112,7 +114,7 @@ public class CameraUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             try {
                 //https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html
-                CameraManager cameraManager = (CameraManager) Collect.getInstance()
+                CameraManager cameraManager = (CameraManager) InfrastructureProvider.INSTANCE.getApplicationContext()
                         .getSystemService(Context.CAMERA_SERVICE);
                 if (cameraManager != null) {
                     String[] cameraId = cameraManager.getCameraIdList();

@@ -39,7 +39,10 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.exception.ExternalParamsException;
 import org.odk.collect.android.external.ExternalAppsUtils;
 import org.odk.collect.android.utilities.ActivityAvailability;
@@ -155,7 +158,7 @@ public class ExStringWidget extends QuestionWidget implements BinaryWidget {
         answerLayout.addView(answer);
         addAnswerView(answerLayout);
 
-        Collect.getInstance().logRemoteAnalytics("WidgetType", "ExternalApp", Collect.getCurrentFormIdentifierHash());
+        CollectInitialiser.INSTANCE.logRemoteAnalytics("WidgetType", "ExternalApp", CollectInitialiser.INSTANCE.getCurrentFormIdentifierHash());
     }
 
     protected void fireActivity(Intent i) throws ActivityNotFoundException {

@@ -40,7 +40,9 @@ import org.odk.collect.android.BuildConfig;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.CaptureSelfieVideoActivity;
 import org.odk.collect.android.activities.CaptureSelfieVideoActivityNewApi;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.listeners.PermissionListener;
 import org.odk.collect.android.preferences.GeneralKeys;
 import org.odk.collect.android.utilities.CameraUtils;
@@ -373,8 +375,8 @@ public class VideoWidget extends QuestionWidget implements FileWidget {
             }
         }
 
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(Collect
-                .getInstance());
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(InfrastructureProvider.INSTANCE
+                .getApplicationContext());
 
         // request high resolution if configured for that...
         boolean highResolution = settings.getBoolean(

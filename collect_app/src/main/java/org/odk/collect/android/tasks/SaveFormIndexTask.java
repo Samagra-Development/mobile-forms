@@ -19,7 +19,9 @@ package org.odk.collect.android.tasks;
 import android.os.AsyncTask;
 
 import org.javarosa.core.model.FormIndex;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.logic.FormController;
 
 import java.io.File;
@@ -48,7 +50,7 @@ public class SaveFormIndexTask extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         long start = System.currentTimeMillis();
 
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
 
         try {
             File tempFormIndexFile = SaveToDiskTask.getFormIndexFile(formController.getInstanceFile().getName());
@@ -88,7 +90,7 @@ public class SaveFormIndexTask extends AsyncTask<Void, Void, String> {
     public static FormIndex loadFormIndexFromFile() {
         FormIndex formIndex = null;
         try {
-            String instanceName = Collect.getInstance()
+            String instanceName = CollectInitialiser.INSTANCE
                     .getFormController()
                     .getInstanceFile()
                     .getName();

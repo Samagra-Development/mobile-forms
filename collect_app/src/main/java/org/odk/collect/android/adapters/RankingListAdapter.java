@@ -29,7 +29,9 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.RankingListAdapter.ItemViewHolder;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.utilities.ThemeUtils;
 
@@ -55,7 +57,7 @@ public class RankingListAdapter extends Adapter<ItemViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final ItemViewHolder holder, int position) {
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         String itemName = formController != null
                 ? formController.getQuestionPrompt(formIndex).getSelectChoiceText(getItem(formController, values.get(position)))
                 : values.get(position);
@@ -93,7 +95,7 @@ public class RankingListAdapter extends Adapter<ItemViewHolder> {
         ItemViewHolder(View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.rank_item_text);
-            textView.setTextSize(Collect.getQuestionFontsize());
+            textView.setTextSize(CollectInitialiser.INSTANCE.getQuestionFontsize());
             themeUtils = new ThemeUtils(itemView.getContext());
         }
 

@@ -43,7 +43,9 @@ import com.google.api.services.drive.Drive;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.FileArrayAdapter;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.exception.MultipleFoldersFoundException;
 import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.android.listeners.GoogleDriveFormDownloadListener;
@@ -795,7 +797,7 @@ public class GoogleDriveActivity extends FormListActivity implements View.OnClic
 
                 try {
                     downloadFile(fileItem.getDriveId(), fileItem.getName());
-                    results.put(fileItem.getName(), Collect.getInstance().getString(R.string.success));
+                    results.put(fileItem.getName(), InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.success));
 
                     String mediaDirName = FileUtils.constructMediaPath(fileItem.getName());
 
@@ -811,12 +813,12 @@ public class GoogleDriveActivity extends FormListActivity implements View.OnClic
                         List<com.google.api.services.drive.model.File> mediaFileList;
                         mediaFileList = driveHelper.getFilesFromDrive(null, folderId);
 
-                        FileUtils.createFolder(Collect.FORMS_PATH + File.separator + mediaDirName);
+                        FileUtils.createFolder(CollectInitialiser.INSTANCE.getFORMS_PATH() + File.separator + mediaDirName);
 
                         for (com.google.api.services.drive.model.File mediaFile : mediaFileList) {
                             String filePath = mediaDirName + File.separator + mediaFile.getName();
                             downloadFile(mediaFile.getId(), filePath);
-                            results.put(filePath, Collect.getInstance().getString(R.string.success));
+                            results.put(filePath, InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.success));
                         }
                     }
                 } catch (Exception e) {
@@ -829,7 +831,7 @@ public class GoogleDriveActivity extends FormListActivity implements View.OnClic
         }
 
         private void downloadFile(@NonNull String fileId, String fileName) throws IOException {
-            File file = new File(Collect.FORMS_PATH + File.separator + fileName);
+            File file = new File(CollectInitialiser.INSTANCE.getFORMS_PATH() + File.separator + fileName);
             driveHelper.downloadFile(fileId, file);
         }
 

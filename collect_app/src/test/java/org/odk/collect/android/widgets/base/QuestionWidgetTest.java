@@ -9,7 +9,9 @@ import org.javarosa.core.model.data.StringData;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.widgets.ItemsetWidgetTest;
 import org.odk.collect.android.widgets.interfaces.Widget;
@@ -79,7 +81,7 @@ public abstract class QuestionWidgetTest<W extends Widget, A extends IAnswerData
 
         when(formEntryPrompt.getIndex()).thenReturn(formIndex);
 
-        Collect.getInstance().setFormController(formController);
+        CollectInitialiser.INSTANCE.setFormController(formController);
 
         widget = null;
     }

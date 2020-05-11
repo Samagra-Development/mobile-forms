@@ -17,7 +17,9 @@ package org.odk.collect.android.dao.helpers;
 import android.database.Cursor;
 import android.net.Uri;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.logic.FormController;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
@@ -43,7 +45,7 @@ public final class InstancesDaoHelper {
         // default to false if we're mid form
         boolean complete = false;
 
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         if (formController != null && formController.getInstanceFile() != null) {
             // First check if we're at the end of the form, then check the preferences
             complete = end && (boolean) GeneralSharedPreferences.getInstance()

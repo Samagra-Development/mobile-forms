@@ -23,7 +23,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.database.DatabaseContext;
 import org.odk.collect.android.exception.ExternalDataException;
 import org.odk.collect.android.tasks.FormLoaderTask;
@@ -91,7 +93,7 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
             onCreateNamed(db, ExternalDataUtil.EXTERNAL_DATA_TABLE_NAME);
         } catch (Exception e) {
             throw new ExternalDataException(
-                    Collect.getInstance().getString(R.string.ext_import_generic_error,
+                    InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.ext_import_generic_error,
                             dataSetFile.getName(), e.getMessage()), e);
         }
     }
@@ -99,7 +101,7 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
     private void onCreateNamed(SQLiteDatabase db, String tableName) throws Exception {
         Timber.w("Reading data from '%s", dataSetFile.toString());
 
-        onProgress(Collect.getInstance().getString(R.string.ext_import_progress_message,
+        onProgress(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.ext_import_progress_message,
                 dataSetFile.getName(), ""));
 
         CSVReader reader = null;
@@ -112,7 +114,7 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
 
             if (!ExternalDataUtil.containsAnyData(headerRow)) {
                 throw new ExternalDataException(
-                        Collect.getInstance().getString(R.string.ext_file_no_data_error));
+                        InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.ext_file_no_data_error));
             }
 
             List<String> conflictingColumns =
@@ -123,7 +125,7 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
                 // with the same name,
                 // so the create table query will fail with "duplicate column" error.
                 throw new ExternalDataException(
-                        Collect.getInstance().getString(R.string.ext_conflicting_columns_error,
+                        InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.ext_conflicting_columns_error,
                                 conflictingColumns));
             }
 
@@ -214,7 +216,7 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
                         try {
                             values.put(safeColumnName, Double.parseDouble(columnValue));
                         } catch (NumberFormatException e) {
-                            throw new ExternalDataException(Collect.getInstance().getString(
+                            throw new ExternalDataException(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(
                                     R.string.ext_sortBy_numeric_error, columnValue));
                         }
                     } else {
@@ -225,17 +227,17 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
                 row = reader.readNext();
                 rowCount++;
                 if (rowCount % 100 == 0) {
-                    onProgress(Collect.getInstance().getString(R.string.ext_import_progress_message,
+                    onProgress(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.ext_import_progress_message,
                             dataSetFile.getName(), " (" + rowCount + " records so far)"));
                 }
             }
 
             if (formLoaderTask.isCancelled()) {
                 Timber.w("User canceled reading data from %s", dataSetFile.toString());
-                onProgress(Collect.getInstance().getString(R.string.ext_import_cancelled_message));
+                onProgress(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.ext_import_cancelled_message));
             } else {
 
-                onProgress(Collect.getInstance().getString(R.string.ext_import_finalizing_message));
+                onProgress(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.ext_import_finalizing_message));
 
                 // now create the indexes
                 for (String createIndexCommand : createIndexesCommands) {
@@ -244,7 +246,7 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
                 }
 
                 Timber.w("Read all data from %s", dataSetFile.toString());
-                onProgress(Collect.getInstance().getString(R.string.ext_import_completed_message));
+                onProgress(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.ext_import_completed_message));
             }
         } finally {
             if (reader != null) {

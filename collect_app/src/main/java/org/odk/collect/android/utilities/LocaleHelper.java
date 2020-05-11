@@ -7,7 +7,10 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.preferences.GeneralKeys;
 
 import java.util.Locale;
@@ -42,7 +45,7 @@ public class LocaleHelper {
                 .getString(GeneralKeys.KEY_APP_LANGUAGE, "");
         boolean isUsingSysLanguage = localeCode.equals("");
         if (isUsingSysLanguage) {
-            localeCode = Collect.defaultSysLanguage;
+            localeCode = CollectInitialiser.INSTANCE.getDefaultSysLanguage();
         }
         return localeCode;
     }

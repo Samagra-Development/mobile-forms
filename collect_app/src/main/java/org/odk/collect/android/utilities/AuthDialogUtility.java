@@ -24,7 +24,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 
 import javax.inject.Inject;
 
@@ -42,7 +44,7 @@ public class AuthDialogUtility {
     @Inject WebCredentialsUtils webCredentialsUtils;
 
     public AuthDialogUtility() {
-        Collect.getInstance().getComponent().inject(this);
+        CollectInitialiser.INSTANCE.getComponent().inject(this);
     }
 
     public AlertDialog createDialog(final Context context,

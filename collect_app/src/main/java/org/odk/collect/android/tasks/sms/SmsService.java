@@ -12,7 +12,10 @@ import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.events.RxEventBus;
@@ -343,7 +346,7 @@ public class SmsService {
                 }
             }
 
-            Collect.getInstance().logRemoteAnalytics("Submission", "SMS", Collect.getFormIdentifierHash(formId, formVersion));
+            CollectInitialiser.INSTANCE.logRemoteAnalytics("Submission", "SMS", CollectInitialiser.INSTANCE.getFormIdentifierHash(formId, formVersion));
         }
     }
 

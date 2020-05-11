@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.helpers.ContentResolverHelper;
 import org.odk.collect.android.exception.GDriveConnectionException;
 import org.odk.collect.android.fragments.dialogs.ProgressDialogFragment;
@@ -46,7 +48,7 @@ public class MediaLoadingTask extends AsyncTask<Uri, Void, File> {
     protected File doInBackground(Uri... uris) {
 
         File instanceFile;
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
 
         if (formController != null) {
             instanceFile = formController.getInstanceFile();

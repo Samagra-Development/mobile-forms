@@ -15,7 +15,11 @@
 package org.odk.collect.android.tasks;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dto.Instance;
 import org.odk.collect.android.http.OpenRosaHttpInterface;
 import org.odk.collect.android.logic.PropertyManager;
@@ -48,7 +52,7 @@ public class InstanceServerUploaderTask extends InstanceUploaderTask {
     private String customPassword;
 
     public InstanceServerUploaderTask() {
-        Collect.getInstance().getComponent().inject(this);
+        CollectInitialiser.INSTANCE.getComponent().inject(this);
     }
 
     @Override
@@ -58,7 +62,7 @@ public class InstanceServerUploaderTask extends InstanceUploaderTask {
         InstanceServerUploader uploader = new InstanceServerUploader(httpInterface, webCredentialsUtils, new HashMap<>());
         List<Instance> instancesToUpload = uploader.getInstancesFromIds(instanceIdsToUpload);
 
-        String deviceId = new PropertyManager(Collect.getInstance().getApplicationContext())
+        String deviceId = new PropertyManager(InfrastructureProvider.INSTANCE.getApplicationContext())
                     .getSingularProperty(PropertyManager.withUri(PropertyManager.PROPMGR_DEVICE_ID));
 
         for (int i = 0; i < instancesToUpload.size(); i++) {
@@ -73,9 +77,10 @@ public class InstanceServerUploaderTask extends InstanceUploaderTask {
                 String destinationUrl = uploader.getUrlToSubmitTo(instance, deviceId, completeDestinationUrl);
                 String customMessage = uploader.uploadOneSubmission(instance, destinationUrl);
                 outcome.messagesByInstanceId.put(instance.getDatabaseId().toString(),
-                        customMessage != null ? customMessage : Collect.getInstance().getString(R.string.success));
+                        customMessage != null ? customMessage :
+                                InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.success));
 
-                Collect.getInstance().logRemoteAnalytics("Submission", "HTTP", Collect.getFormIdentifierHash(instance.getJrFormId(), instance.getJrVersion()));
+                CollectInitialiser.INSTANCE.logRemoteAnalytics("Submission", "HTTP", CollectInitialiser.INSTANCE.getFormIdentifierHash(instance.getJrFormId(), instance.getJrVersion()));
             } catch (UploadAuthRequestedException e) {
                 outcome.authRequestingServer = e.getAuthRequestingServer();
                 // Don't add the instance that caused an auth request to the map because we want to

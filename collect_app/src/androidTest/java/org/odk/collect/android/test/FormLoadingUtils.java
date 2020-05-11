@@ -26,7 +26,9 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.apache.commons.io.IOUtils;
 import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.tasks.FormLoaderTask;
@@ -55,7 +57,7 @@ public class FormLoadingUtils {
      * folder to the SD Card where it will be loaded by {@link FormLoaderTask}.
      */
     public static void copyFormToSdCard(String formFilename, String formAssetPath, List<String> mediaFilenames) throws IOException {
-        Collect.createODKDirs();
+        CollectInitialiser.INSTANCE.createODKDirs();
 
         if (formAssetPath == null) {
             formAssetPath = "";
@@ -106,7 +108,7 @@ public class FormLoadingUtils {
             @Override
             protected Intent getActivityIntent() {
                 Intent intent = new Intent(ApplicationProvider.getApplicationContext(), FormEntryActivity.class);
-                intent.putExtra(EXTRA_TESTING_PATH, Collect.FORMS_PATH + "/" + formFilename);
+                intent.putExtra(EXTRA_TESTING_PATH, CollectInitialiser.INSTANCE.getFORMS_PATH() + "/" + formFilename);
 
                 return intent;
             }
@@ -120,7 +122,7 @@ public class FormLoadingUtils {
     }
 
     private static void copyForm(String formFilename, String formAssetPath) throws IOException {
-        String pathname = Collect.FORMS_PATH + "/" + formFilename;
+        String pathname = CollectInitialiser.INSTANCE.getFORMS_PATH() + "/" + formFilename;
 
         AssetManager assetManager = InstrumentationRegistry.getInstrumentation().getContext().getAssets();
         InputStream inputStream = assetManager.open(formAssetPath + formFilename);
@@ -134,7 +136,7 @@ public class FormLoadingUtils {
     }
 
     private static void copyFormMediaFiles(String formFilename, String formAssetPath, List<String> mediaFilenames) throws IOException {
-        String mediaPathName = Collect.FORMS_PATH + "/" + formFilename.replace(".xml", "") + FileUtils.MEDIA_SUFFIX + "/";
+        String mediaPathName = CollectInitialiser.INSTANCE.getFORMS_PATH() + "/" + formFilename.replace(".xml", "") + FileUtils.MEDIA_SUFFIX + "/";
         FileUtils.checkMediaPath(new File(mediaPathName));
 
         AssetManager assetManager = InstrumentationRegistry.getInstrumentation().getContext().getAssets();

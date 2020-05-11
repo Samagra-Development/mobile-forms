@@ -28,7 +28,9 @@ import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.database.ItemsetDbAdapter;
 import org.odk.collect.android.database.helpers.FormsDatabaseHelper;
 import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
@@ -62,7 +64,7 @@ public class FormsProvider extends ContentProvider {
     private synchronized FormsDatabaseHelper getDbHelper() {
         // wrapper to test and reset/set the dbHelper based upon the attachment state of the device.
         try {
-            Collect.createODKDirs();
+            CollectInitialiser.INSTANCE.createODKDirs();
         } catch (RuntimeException e) {
             return null;
         }
@@ -204,7 +206,7 @@ public class FormsProvider extends ContentProvider {
             values.put(FormsColumns.MD5_HASH, md5);
 
             if (!values.containsKey(FormsColumns.JRCACHE_FILE_PATH)) {
-                String cachePath = Collect.CACHE_PATH + File.separator + md5
+                String cachePath = CollectInitialiser.INSTANCE.getCACHE_PATH() + File.separator + md5
                         + ".formdef";
                 values.put(FormsColumns.JRCACHE_FILE_PATH, cachePath);
             }
@@ -491,7 +493,7 @@ public class FormsProvider extends ContentProvider {
                                         .getMd5Hash(new File(formFile));
                                 values.put(FormsColumns.MD5_HASH, newMd5);
                                 values.put(FormsColumns.JRCACHE_FILE_PATH,
-                                        Collect.CACHE_PATH + File.separator + newMd5
+                                        CollectInitialiser.INSTANCE.getCACHE_PATH() + File.separator + newMd5
                                                 + ".formdef");
                             }
 

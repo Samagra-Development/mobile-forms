@@ -7,7 +7,10 @@ import com.samagra.commons.Constants;
 import com.samagra.commons.MainApplication;
 
 import org.odk.collect.android.activities.InstanceUploaderListActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.utilities.ApplicationConstants;
 import org.odk.collect.android.utilities.DownloadFormListUtils;
 
@@ -79,5 +82,5 @@ public class ODKDriver {
         return modifyToolbarIcon;
     }
 
-    public static DownloadFormListUtils getDownloadFormListUtils() {return Collect.getInstance().getComponent().downloadFormListUtils();}
+    public static DownloadFormListUtils getDownloadFormListUtils() {return CollectInitialiser.INSTANCE.getComponent().downloadFormListUtils();}
 }

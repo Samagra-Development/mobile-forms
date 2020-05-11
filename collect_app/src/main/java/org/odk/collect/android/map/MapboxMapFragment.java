@@ -43,7 +43,9 @@ import com.mapbox.mapboxsdk.utils.ColorUtils;
 
 import org.odk.collect.android.BuildConfig;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.mapboxsdk.MapFragment;
 import org.odk.collect.android.preferences.GeneralKeys;
 
@@ -125,7 +127,7 @@ public class MapboxMapFragment extends MapFragment implements org.odk.collect.an
 
     @Override public void addTo(@NonNull FragmentActivity activity, int containerId, @Nullable ReadyListener listener) {
         if (MapboxUtils.initMapbox() == null) {
-            MapboxUtils.warnMapboxUnsupported(Collect.getInstance());
+            MapboxUtils.warnMapboxUnsupported(InfrastructureProvider.INSTANCE.getApplicationContext());
             if (listener != null) {
                 listener.onReady(null);
             }
@@ -147,7 +149,7 @@ public class MapboxMapFragment extends MapFragment implements org.odk.collect.an
             this.map = map;  // signature of getMapAsync() ensures map is never null
 
             map.setStyle(getDesiredStyleBuilder(), style -> {
-                for (File file : new File(Collect.OFFLINE_LAYERS).listFiles()) {
+                for (File file : new File(CollectInitialiser.INSTANCE.getOFFLINE_LAYERS()).listFiles()) {
                     String name = file.getName();
                     if (name.endsWith(".mbtiles")) {
                         String id = name.substring(0, name.length() - ".mbtiles".length());

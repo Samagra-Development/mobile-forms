@@ -32,7 +32,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.InstanceListCursorAdapter;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.listeners.DiskSyncListener;
 import org.odk.collect.android.listeners.PermissionListener;
@@ -94,7 +97,7 @@ public class InstanceChooserList extends InstanceListActivity implements
             public void granted() {
                 // must be at the beginning of any activity that can be called from an external intent
                 try {
-                    Collect.createODKDirs();
+                    CollectInitialiser.INSTANCE.createODKDirs();
                 } catch (RuntimeException e) {
                     createErrorDialog(e.getMessage(), EXIT);
                     return;
@@ -123,7 +126,7 @@ public class InstanceChooserList extends InstanceListActivity implements
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (Collect.allowClick(getClass().getName())) {
+        if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
             if (view.isEnabled()) {
                 Cursor c = (Cursor) listView.getAdapter().getItem(position);
                 Uri instanceUri =

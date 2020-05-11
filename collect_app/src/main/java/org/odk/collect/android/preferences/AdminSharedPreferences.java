@@ -16,7 +16,9 @@ package org.odk.collect.android.preferences;
 
 import android.content.SharedPreferences.Editor;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 
 import static org.odk.collect.android.preferences.AdminKeys.ALL_KEYS;
 import static org.odk.collect.android.preferences.AdminKeys.KEY_ADMIN_PW;
@@ -28,7 +30,7 @@ public class AdminSharedPreferences {
     private final android.content.SharedPreferences sharedPreferences;
 
     private AdminSharedPreferences() {
-        sharedPreferences = Collect.getInstance().getSharedPreferences(ADMIN_PREFERENCES, 0);
+        sharedPreferences = InfrastructureProvider.INSTANCE.getApplicationContext().getSharedPreferences(ADMIN_PREFERENCES, 0);
     }
 
     public static synchronized AdminSharedPreferences getInstance() {

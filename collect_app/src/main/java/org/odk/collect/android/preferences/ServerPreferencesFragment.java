@@ -38,7 +38,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.http.CollectServerClient;
 import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.android.listeners.OnBackPressedListener;
@@ -446,7 +448,7 @@ public class ServerPreferencesFragment extends BasePreferenceFragment implements
         String urlHash = FileUtils.getMd5Hash(
                 new ByteArrayInputStream(url.getBytes()));
 
-        Collect.getInstance().logRemoteAnalytics("SetServer", scheme + " " + host, urlHash);
+        CollectInitialiser.INSTANCE.logRemoteAnalytics("SetServer", scheme + " " + host, urlHash);
     }
 
     private void maskPasswordSummary(String password) {

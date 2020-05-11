@@ -22,7 +22,11 @@ import android.os.AsyncTask;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.form.api.FormEntryController;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.exception.EncryptionException;
 import org.odk.collect.android.listeners.FormSavedListener;
@@ -81,9 +85,9 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
     protected SaveResult doInBackground(Void... nothing) {
         SaveResult saveResult = new SaveResult();
 
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
 
-        publishProgress(Collect.getInstance().getString(R.string.survey_saving_validating_message));
+        publishProgress(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.survey_saving_validating_message));
 
         try {
             int validateStatus = formController.validateAnswers(markCompleted);
@@ -113,7 +117,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
         }
 
         // close all open databases of external data.
-        Collect.getInstance().getExternalDataManager().close();
+        CollectInitialiser.INSTANCE.getExternalDataManager().close();
 
         // if there is a meta/instanceName field, be sure we are using the latest value
         // just in case the validate somehow triggered an update.
@@ -145,7 +149,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
 
     private void updateInstanceDatabase(boolean incomplete, boolean canEditAfterCompleted) {
 
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
 
         // Update the instance database...
         ContentValues values = new ContentValues();
@@ -161,9 +165,9 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
         values.put(InstanceColumns.CAN_EDIT_WHEN_COMPLETE, Boolean.toString(canEditAfterCompleted));
 
         // If FormEntryActivity was started with an Instance, just update that instance
-        if (Collect.getInstance().getContentResolver().getType(uri).equals(
+        if (InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().getType(uri).equals(
                 InstanceColumns.CONTENT_ITEM_TYPE)) {
-            int updated = Collect.getInstance().getContentResolver().update(uri, values, null,
+            int updated =InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().update(uri, values, null,
                     null);
             if (updated > 1) {
                 Timber.w("Updated more than one entry, that's not good: %s", uri.toString());
@@ -172,7 +176,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
             } else {
                 Timber.e("Instance doesn't exist but we have its Uri!! %s", uri.toString());
             }
-        } else if (Collect.getInstance().getContentResolver().getType(uri).equals(
+        } else if (InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().getType(uri).equals(
                 FormsColumns.CONTENT_ITEM_TYPE)) {
             // If FormEntryActivity was started with a form, then it's likely the first time we're
             // saving.
@@ -196,7 +200,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
                 Cursor c = null;
                 try {
                     // retrieve the form definition...
-                    c = Collect.getInstance().getContentResolver().query(uri, null, null, null,
+                    c =InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().query(uri, null, null, null,
                             null);
                     c.moveToFirst();
                     String formname = c.getString(c.getColumnIndex(FormsColumns.DISPLAY_NAME));
@@ -231,7 +235,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
      * Return the savepoint file for a given instance.
      */
     static File getSavepointFile(String instanceName) {
-        File tempDir = new File(Collect.CACHE_PATH);
+        File tempDir = new File(CollectInitialiser.INSTANCE.getCACHE_PATH());
         return new File(tempDir, instanceName + ".save");
     }
 
@@ -239,7 +243,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
      * Return the formIndex file for a given instance.
      */
     public static File getFormIndexFile(String instanceName) {
-        File tempDir = new File(Collect.CACHE_PATH);
+        File tempDir = new File(CollectInitialiser.INSTANCE.getCACHE_PATH());
         return new File(tempDir, instanceName + ".index");
     }
 
@@ -256,9 +260,9 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
      * other methods.
      */
     private void exportData(boolean markCompleted) throws IOException, EncryptionException {
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
 
-        publishProgress(Collect.getInstance().getString(R.string.survey_saving_collecting_message));
+        publishProgress(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.survey_saving_collecting_message));
 
         ByteArrayPayload payload = formController.getFilledInFormXml();
         // write out xml
@@ -266,7 +270,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
 
         MediaManager.INSTANCE.saveChanges();
 
-        publishProgress(Collect.getInstance().getString(R.string.survey_saving_saving_message));
+        publishProgress(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.survey_saving_saving_message));
 
         writeFile(payload, instancePath);
 
@@ -302,7 +306,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
             // write out submission.xml -- the data to actually submit to aggregate
 
             publishProgress(
-                    Collect.getInstance().getString(R.string.survey_saving_finalizing_message));
+                    InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.survey_saving_finalizing_message));
 
             writeFile(payload, submissionXml.getAbsolutePath());
 
@@ -315,7 +319,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
                 // and encrypt the submission (this is a one-way operation)...
 
                 publishProgress(
-                        Collect.getInstance().getString(R.string.survey_saving_encrypting_message));
+                        InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.survey_saving_encrypting_message));
 
                 EncryptionUtils.generateEncryptedSubmission(instanceXml, submissionXml, formInfo);
                 isEncrypted = true;

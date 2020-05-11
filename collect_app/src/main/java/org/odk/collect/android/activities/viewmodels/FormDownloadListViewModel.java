@@ -19,7 +19,9 @@ package org.odk.collect.android.activities.viewmodels;
 import androidx.lifecycle.ViewModel;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.logic.FormDetails;
 
 import java.util.ArrayList;
@@ -73,7 +75,7 @@ public class FormDownloadListViewModel extends ViewModel {
     }
 
     public String getProgressDialogMsg() {
-        return progressDialogMsg == null ? Collect.getInstance().getString(R.string.please_wait) : progressDialogMsg;
+        return progressDialogMsg == null ? InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.please_wait) : progressDialogMsg;
     }
 
     public void setProgressDialogMsg(String progressDialogMsg) {

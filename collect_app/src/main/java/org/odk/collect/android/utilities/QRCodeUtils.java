@@ -38,7 +38,9 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,10 +56,10 @@ import io.reactivex.Observable;
 import timber.log.Timber;
 
 public class QRCodeUtils {
-    public static final String QR_CODE_FILEPATH = Collect.SETTINGS + File.separator + "collect-settings.png";
+    public static final String QR_CODE_FILEPATH = CollectInitialiser.INSTANCE.getSETTINGS() + File.separator + "collect-settings.png";
     private static final int QR_CODE_SIDE_LENGTH = 400; // in pixels
     private static final String SETTINGS_MD5_FILE = ".collect-settings-hash";
-    static final String MD5_CACHE_PATH = Collect.SETTINGS + File.separator + SETTINGS_MD5_FILE;
+    static final String MD5_CACHE_PATH = CollectInitialiser.INSTANCE.getSETTINGS() + File.separator + SETTINGS_MD5_FILE;
 
     private QRCodeUtils() {
     }
@@ -90,7 +92,7 @@ public class QRCodeUtils {
 
         // Maximum capacity for QR Codes is 4,296 characters (Alphanumeric)
         if (compressedData.length() > 4000) {
-            throw new IOException(Collect.getInstance().getString(R.string.encoding_max_limit));
+            throw new IOException(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.encoding_max_limit));
         }
 
         Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
@@ -120,7 +122,7 @@ public class QRCodeUtils {
             Bitmap bitmap = null;
 
             // check if settings directory exists, if not then create one
-            File writeDir = new File(Collect.SETTINGS);
+            File writeDir = new File(CollectInitialiser.INSTANCE.getSETTINGS());
             if (!writeDir.exists()) {
                 if (!writeDir.mkdirs()) {
                     Timber.e("Error creating directory " + writeDir.getAbsolutePath());

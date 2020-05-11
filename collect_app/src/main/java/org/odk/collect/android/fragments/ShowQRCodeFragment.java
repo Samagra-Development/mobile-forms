@@ -45,7 +45,9 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.R2;
 import org.odk.collect.android.activities.MainMenuActivity;
 import org.odk.collect.android.activities.ScannerWithFlashlightActivity;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.listeners.ActionListener;
 import org.odk.collect.android.listeners.PermissionListener;
 import org.odk.collect.android.preferences.AdminPreferencesActivity;
@@ -271,8 +273,8 @@ public class ShowQRCodeFragment extends Fragment {
         new PreferenceSaver(GeneralSharedPreferences.getInstance(), AdminSharedPreferences.getInstance()).fromJSON(content, new ActionListener() {
             @Override
             public void onSuccess() {
-                Collect.getInstance().initProperties();
-                ToastUtils.showLongToast(Collect.getInstance().getString(R.string.successfully_imported_settings));
+                CollectInitialiser.INSTANCE.initProperties();
+                ToastUtils.showLongToast(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.successfully_imported_settings));
                 getActivity().finish();
                 final LocaleHelper localeHelper = new LocaleHelper();
                 localeHelper.updateLocale(getActivity());
@@ -282,7 +284,7 @@ public class ShowQRCodeFragment extends Fragment {
             @Override
             public void onFailure(Exception exception) {
                 if (exception instanceof GeneralSharedPreferences.ValidationException) {
-                    ToastUtils.showLongToast(Collect.getInstance().getString(R.string.invalid_qrcode));
+                    ToastUtils.showLongToast(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.invalid_qrcode));
                 } else {
                     Timber.e(exception);
                 }
@@ -305,7 +307,7 @@ public class ShowQRCodeFragment extends Fragment {
             }
             return true;
         } else if (i == R.id.menu_save_preferences) {
-            File writeDir = new File(Collect.SETTINGS);
+            File writeDir = new File(CollectInitialiser.INSTANCE.getSETTINGS());
             if (!writeDir.exists()) {
                 if (!writeDir.mkdirs()) {
                     ToastUtils.showShortToast("Error creating directory "
@@ -314,7 +316,7 @@ public class ShowQRCodeFragment extends Fragment {
                 }
             }
 
-            File dst = new File(writeDir.getAbsolutePath() + "/collect.settings");
+            File dst = new File(writeDir.getAbsolutePath() + "/CollectInitialiser.INSTANCE.getSETTINGS()");
             boolean success = AdminPreferencesActivity.saveSharedPreferencesToFile(dst, getActivity());
             if (success) {
                 ToastUtils.showLongToast("Settings successfully written to "

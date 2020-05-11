@@ -26,7 +26,9 @@ import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.exception.EncryptionException;
 import org.odk.collect.android.logic.FormController.InstanceMetadata;
@@ -253,7 +255,7 @@ public class EncryptionUtils {
     public static EncryptedFormInformation getEncryptedFormInformation(Uri uri,
             InstanceMetadata instanceMetadata) throws EncryptionException {
 
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr =InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver();
 
         // fetch the form information
         String formId;
@@ -270,7 +272,7 @@ public class EncryptionUtils {
                 try {
                     instanceCursor = cr.query(uri, null, null, null, null);
                     if (instanceCursor.getCount() != 1) {
-                        String msg = Collect.getInstance().getString(R.string.not_exactly_one_record_for_this_instance);
+                        String msg = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.not_exactly_one_record_for_this_instance);
                         Timber.e(msg);
                         throw new EncryptionException(msg, null);
                     }
@@ -297,7 +299,7 @@ public class EncryptionUtils {
                 formCursor = new FormsDao().getFormsCursor(selection, selectionArgs);
 
                 if (formCursor.getCount() != 1) {
-                    String msg = Collect.getInstance().getString(R.string.not_exactly_one_blank_form_for_this_form_id);
+                    String msg = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.not_exactly_one_blank_form_for_this_form_id);
                     Timber.e(msg);
                     throw new EncryptionException(msg, null);
                 }
@@ -305,7 +307,7 @@ public class EncryptionUtils {
             } else if (FormsColumns.CONTENT_ITEM_TYPE.equals(cr.getType(uri))) {
                 formCursor = cr.query(uri, null, null, null, null);
                 if (formCursor.getCount() != 1) {
-                    String msg = Collect.getInstance().getString(R.string.not_exactly_one_blank_form_for_this_form_id);
+                    String msg = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.not_exactly_one_blank_form_for_this_form_id);
                     Timber.e(msg);
                     throw new EncryptionException(msg, null);
                 }
@@ -314,7 +316,7 @@ public class EncryptionUtils {
 
             formId = formCursor.getString(formCursor.getColumnIndex(FormsColumns.JR_FORM_ID));
             if (formId == null || formId.length() == 0) {
-                String msg = Collect.getInstance().getString(R.string.no_form_id_specified);
+                String msg = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.no_form_id_specified);
                 Timber.e(msg);
                 throw new EncryptionException(msg, null);
             }
@@ -335,14 +337,14 @@ public class EncryptionUtils {
             try {
                 kf = KeyFactory.getInstance(RSA_ALGORITHM);
             } catch (NoSuchAlgorithmException e) {
-                String msg = Collect.getInstance().getString(R.string.phone_does_not_support_rsa);
+                String msg = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.phone_does_not_support_rsa);
                 Timber.e(e, "%s due to %s ", msg, e.getMessage());
                 throw new EncryptionException(msg, e);
             }
             try {
                 pk = kf.generatePublic(publicKeySpec);
             } catch (InvalidKeySpecException e) {
-                String msg = Collect.getInstance().getString(R.string.invalid_rsa_public_key);
+                String msg = InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.invalid_rsa_public_key);
                 Timber.e(e, "%s due to %s ", msg, e.getMessage());
                 throw new EncryptionException(msg, e);
             }

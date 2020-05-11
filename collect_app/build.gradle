@@ -1,4 +1,8 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
 apply from: '../config/quality.gradle'
 apply from: '../config/jacoco.gradle'
 apply plugin: 'com.jakewharton.butterknife'
@@ -287,14 +291,14 @@ dependencies {
 
     // Dagger:
     implementation "com.google.dagger:dagger:${rootProject.daggerVersion}"
-    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.daggerVersion}"
+    kapt "com.google.dagger:dagger-compiler:${rootProject.daggerVersion}"
     testAnnotationProcessor "com.google.dagger:dagger-compiler:${rootProject.daggerVersion}"
     // Needed for injection into Robolectric tests
 
     // Dagger Android:
     implementation "com.google.dagger:dagger-android:${rootProject.daggerVersion}"
     implementation "com.google.dagger:dagger-android-support:${rootProject.daggerVersion}"
-    annotationProcessor "com.google.dagger:dagger-android-processor:${rootProject.daggerVersion}"
+    kapt "com.google.dagger:dagger-android-processor:${rootProject.daggerVersion}"
 
     // RxJava 2:
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
@@ -364,11 +368,17 @@ dependencies {
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:${rootProject.okhttp3Version}"
 
     androidTestImplementation "android.arch.work:work-testing:${rootProject.workManagerVersion}"
+    implementation "androidx.core:core-ktx:+"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-alpha02"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 // Must be at bottom to prevent dependency collisions
 // https://developers.google.com/android/guides/google-services-plugin
 apply plugin: 'com.google.gms.google-services'
+repositories {
+    mavenCentral()
+}
 
 
 

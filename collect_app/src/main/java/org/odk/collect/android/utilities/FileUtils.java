@@ -29,7 +29,9 @@ import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -428,7 +430,7 @@ public class FileUtils {
             boolean deleted = mediaDir.delete();
             if (!deleted) {
                 throw new RuntimeException(
-                        Collect.getInstance().getString(R.string.fs_delete_media_path_if_file_error,
+                        InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.fs_delete_media_path_if_file_error,
                                 mediaDir.getAbsolutePath()));
             }
         }
@@ -437,7 +439,7 @@ public class FileUtils {
         boolean createdOrExisted = createFolder(mediaDir.getAbsolutePath());
         if (!createdOrExisted) {
             throw new RuntimeException(
-                    Collect.getInstance().getString(R.string.fs_create_media_folder_error,
+                    InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(R.string.fs_create_media_folder_error,
                             mediaDir.getAbsolutePath()));
         }
     }

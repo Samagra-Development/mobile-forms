@@ -5,7 +5,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 
 public class ToastUtils {
 
@@ -30,15 +32,15 @@ public class ToastUtils {
     }
 
     private static void showToast(String message, int duration) {
-        Toast.makeText(Collect.getInstance(), message, duration).show();
+        Toast.makeText(InfrastructureProvider.INSTANCE.getApplicationContext(), message, duration).show();
     }
 
     private static void showToast(int messageResource, int duration) {
-        Toast.makeText(Collect.getInstance(), Collect.getInstance().getString(messageResource), duration).show();
+        Toast.makeText(InfrastructureProvider.INSTANCE.getApplicationContext(), InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(messageResource), duration).show();
     }
 
     public static void showShortToastInMiddle(int messageResource) {
-        showToastInMiddle(Collect.getInstance().getString(messageResource), Toast.LENGTH_SHORT);
+        showToastInMiddle(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(messageResource), Toast.LENGTH_SHORT);
     }
 
     public static void showShortToastInMiddle(String message) {
@@ -46,11 +48,11 @@ public class ToastUtils {
     }
 
     public static void showLongToastInMiddle(int messageResource) {
-        showToastInMiddle(Collect.getInstance().getString(messageResource), Toast.LENGTH_LONG);
+        showToastInMiddle(InfrastructureProvider.INSTANCE.getApplicationContext().getResources().getString(messageResource), Toast.LENGTH_LONG);
     }
 
     private static void showToastInMiddle(String message, int duration) {
-        Toast toast = Toast.makeText(Collect.getInstance(), message, duration);
+        Toast toast = Toast.makeText(InfrastructureProvider.INSTANCE.getApplicationContext(), message, duration);
         ViewGroup group = (ViewGroup) toast.getView();
         TextView messageTextView = (TextView) group.getChildAt(0);
         messageTextView.setTextSize(21);

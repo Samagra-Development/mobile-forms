@@ -86,7 +86,10 @@ import org.joda.time.LocalDateTime;
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.IconMenuListAdapter;
 import org.odk.collect.android.adapters.model.IconMenuItem;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.helpers.ContentResolverHelper;
 import org.odk.collect.android.dao.helpers.FormsDaoHelper;
@@ -325,7 +328,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
         if(getIntent() != null)
             formTitle = getIntent().getStringExtra("formTitle");
 
-        Collect.getInstance().getComponent().inject(this);
+        CollectInitialiser.INSTANCE.getComponent().inject(this);
 
         compositeDisposable
                 .add(eventBus
@@ -369,7 +372,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
             public void granted() {
                 // must be at the beginning of any activity that can be called from an external intent
                 try {
-                    Collect.createODKDirs();
+                    CollectInitialiser.INSTANCE.createODKDirs();
                     setupFields(savedInstanceState);
                     loadForm();
 
@@ -467,7 +470,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
             }
 
             // Not a restart from a screen orientation change (or other).
-            Collect.getInstance().setFormController(null);
+            CollectInitialiser.INSTANCE.setFormController(null);
             supportInvalidateOptionsMenu();
             Intent intent = getIntent();
             if (intent != null) {
@@ -556,7 +559,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
                         formPath.lastIndexOf('.'))
                         + "_";
                 final String fileSuffix = ".xml.save";
-                File cacheDir = new File(Collect.CACHE_PATH);
+                File cacheDir = new File(CollectInitialiser.INSTANCE.getCACHE_PATH());
                 File[] files = cacheDir.listFiles(pathname -> {
                     String name = pathname.getName();
                     return name.startsWith(filePrefix)
@@ -574,7 +577,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
                                     candidate.getName().length()
                                             - fileSuffix.length());
                     File instanceDir = new File(
-                            Collect.INSTANCES_PATH + File.separator
+                            CollectInitialiser.INSTANCE.getINSTANCES_PATH() + File.separator
                                     + instanceDirName);
                     File instanceFile = new File(instanceDir,
                             instanceDirName + ".xml");
@@ -659,9 +662,9 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
 
     @Nullable
     private FormController getFormController(boolean formReloading) {
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         if (formController == null) {
-            Collect.getInstance().logNullFormControllerEvent(formReloading ? "FormReloading" : "OtherInFormEntryActivity");
+            CollectInitialiser.INSTANCE.logNullFormControllerEvent(formReloading ? "FormReloading" : "OtherInFormEntryActivity");
         }
 
         return formController;
@@ -809,8 +812,8 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
                  */
                 // The intent is empty, but we know we saved the image to the temp
                 // file
-                ImageConverter.execute(Collect.TMPFILE_PATH, getWidgetWaitingForBinaryData(), this);
-                File fi = new File(Collect.TMPFILE_PATH);
+                ImageConverter.execute(CollectInitialiser.INSTANCE.getTMPFILE_PATH(), getWidgetWaitingForBinaryData(), this);
+                File fi = new File(CollectInitialiser.INSTANCE.getTMPFILE_PATH());
 
                 String instanceFolder = formController.getInstanceFile()
                         .getParent();
@@ -1656,7 +1659,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
                 List<TreeElement> attrs = p.getBindAttributes();
                 for (int i = 0; i < attrs.size(); i++) {
                     if (!autoSaved && "saveIncomplete".equals(attrs.get(i).getName())) {
-                        Collect.getInstance().logRemoteAnalytics("WidgetAttribute", "saveIncomplete", Collect.getCurrentFormIdentifierHash());
+                        CollectInitialiser.INSTANCE.logRemoteAnalytics("WidgetAttribute", "saveIncomplete", CollectInitialiser.INSTANCE.getCurrentFormIdentifierHash());
 
                         saveDataToDisk(false, false, null, false);
                         autoSaved = true;
@@ -1926,7 +1929,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
                     saveDataToDisk(EXIT, InstancesDaoHelper.isInstanceComplete(false), null);
                 } else {
                     // close all open databases of external data.
-                    ExternalDataManager manager = Collect.getInstance().getExternalDataManager();
+                    ExternalDataManager manager = CollectInitialiser.INSTANCE.getExternalDataManager();
                     if (manager != null) {
                         manager.close();
                     }
@@ -2404,7 +2407,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
                     @Override
                     public void granted() {
                         readPhoneStatePermissionRequestNeeded = false;
-                        Collect.getInstance().initProperties();
+                        CollectInitialiser.INSTANCE.initProperties();
                         loadForm();
                     }
 
@@ -2419,10 +2422,10 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
                 formLoaderTask = null;
                 t.cancel(true);
                 t.destroy();
-                Collect.getInstance().setFormController(formController);
+                CollectInitialiser.INSTANCE.setFormController(formController);
                 supportInvalidateOptionsMenu();
 
-                Collect.getInstance().setExternalDataManager(task.getExternalDataManager());
+                CollectInitialiser.INSTANCE.setExternalDataManager(task.getExternalDataManager());
 
                 // Set the language if one has already been set in the past
                 String[] languageTest = formController.getLanguages();
@@ -2471,7 +2474,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
                             Locale.ENGLISH).format(Calendar.getInstance().getTime());
                     String file = formPath.substring(formPath.lastIndexOf('/') + 1,
                             formPath.lastIndexOf('.'));
-                    String path = Collect.INSTANCES_PATH + File.separator + file + "_"
+                    String path = CollectInitialiser.INSTANCE.getINSTANCES_PATH() + File.separator + file + "_"
                             + time;
                     if (FileUtils.createFolder(path)) {
                         File instanceFile = new File(path + File.separator + file + "_" + time + ".xml");
@@ -2964,7 +2967,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
 
     @Override
     public void widgetValueChanged(QuestionWidget changedWidget) {
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = CollectInitialiser.INSTANCE.getFormController();
         if (formController == null) {
             // TODO: As usual, no idea if/how this is possible.
             return;
@@ -2996,7 +2999,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
      */
     private void updateFieldListQuestions(FormIndex lastChangedIndex) {
         // Save the user-visible state for all questions in this field-list
-        FormEntryPrompt[] questionsBeforeSave = Collect.getInstance().getFormController().getQuestionPrompts();
+        FormEntryPrompt[] questionsBeforeSave = CollectInitialiser.INSTANCE.getFormController().getQuestionPrompts();
         List<ImmutableDisplayableQuestion> immutableQuestionsBeforeSave = new ArrayList<>();
         for (FormEntryPrompt questionBeforeSave : questionsBeforeSave) {
             immutableQuestionsBeforeSave.add(new ImmutableDisplayableQuestion(questionBeforeSave));
@@ -3006,7 +3009,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
         // to later quickly match questions that are still relevant with the corresponding question
         // before saving.
         saveAnswersForCurrentScreen(false);
-        FormEntryPrompt[] questionsAfterSave = Collect.getInstance().getFormController().getQuestionPrompts();
+        FormEntryPrompt[] questionsAfterSave = CollectInitialiser.INSTANCE.getFormController().getQuestionPrompts();
 
         Map<FormIndex, FormEntryPrompt> questionsAfterSaveByIndex = new HashMap<>();
         for (FormEntryPrompt question : questionsAfterSave) {
@@ -3046,7 +3049,7 @@ public class FormEntryActivity extends CollectAbstractActivity implements Animat
                 // is never called. This means readOnlyOverride can always be set to false.
                 final int targetIndex = i;
                 runOnUiThread(() -> odkView.addWidgetForQuestion(questionsAfterSave[targetIndex],
-                        false, targetIndex));
+                        false, targetIndex,InfrastructureProvider.INSTANCE.getApplicationContext()));
             }
         }
     }

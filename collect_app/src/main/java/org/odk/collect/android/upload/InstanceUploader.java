@@ -20,7 +20,9 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.dto.Instance;
@@ -91,7 +93,7 @@ public abstract class InstanceUploader {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMITTED);
-        Collect.getInstance().getContentResolver().update(instanceDatabaseUri, contentValues, null, null);
+       InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().update(instanceDatabaseUri, contentValues, null, null);
     }
 
     void saveFailedStatusToDatabase(Instance instance) {
@@ -100,7 +102,7 @@ public abstract class InstanceUploader {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
-        Collect.getInstance().getContentResolver().update(instanceDatabaseUri, contentValues, null, null);
+       InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver().update(instanceDatabaseUri, contentValues, null, null);
     }
 
     /**

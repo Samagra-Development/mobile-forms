@@ -18,7 +18,10 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import androidx.annotation.Nullable;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.tasks.ServerPollingJob;
 
 import java.util.Map;
@@ -35,7 +38,7 @@ public class GeneralSharedPreferences {
     private final android.content.SharedPreferences sharedPreferences;
 
     private GeneralSharedPreferences() {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(InfrastructureProvider.INSTANCE.getApplicationContext());
     }
 
     public static synchronized GeneralSharedPreferences getInstance() {

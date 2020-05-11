@@ -33,7 +33,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.apache.commons.io.IOUtils;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.exception.GDriveConnectionException;
 
 import java.io.BufferedOutputStream;
@@ -77,8 +81,7 @@ public class MediaUtils {
         String selection = Images.ImageColumns.DATA + "=?";
         String[] selectArgs = {imageFile};
         String[] projection = {Images.ImageColumns._ID};
-        try (Cursor c = Collect
-                .getInstance()
+        try (Cursor c = InfrastructureProvider.INSTANCE.getApplicationContext()
                 .getContentResolver()
                 .query(Images.Media.EXTERNAL_CONTENT_URI,
                         projection, selection, selectArgs, null)) {
@@ -97,7 +100,7 @@ public class MediaUtils {
     }
 
     public static final int deleteImageFileFromMediaProvider(String imageFile) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr =InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver();
         // images
         int count = 0;
         Cursor imageCursor = null;
@@ -142,7 +145,7 @@ public class MediaUtils {
     }
 
     public static final int deleteImagesInFolderFromMediaProvider(File folder) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr =InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver();
         // images
         int count = 0;
         Cursor imageCursor = null;
@@ -188,8 +191,7 @@ public class MediaUtils {
         String[] projection = {Audio.AudioColumns._ID};
         Cursor c = null;
         try {
-            c = Collect
-                    .getInstance()
+            c = InfrastructureProvider.INSTANCE.getApplicationContext()
                     .getContentResolver()
                     .query(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                             projection, selection, selectArgs, null);
@@ -212,7 +214,7 @@ public class MediaUtils {
     }
 
     public static final int deleteAudioFileFromMediaProvider(String audioFile) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr =InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver();
         // audio
         int count = 0;
         Cursor audioCursor = null;
@@ -257,7 +259,7 @@ public class MediaUtils {
     }
 
     public static final int deleteAudioInFolderFromMediaProvider(File folder) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr = InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver();
         // audio
         int count = 0;
         Cursor audioCursor = null;
@@ -303,8 +305,7 @@ public class MediaUtils {
         String[] projection = {Video.VideoColumns._ID};
         Cursor c = null;
         try {
-            c = Collect
-                    .getInstance()
+            c = InfrastructureProvider.INSTANCE.getApplicationContext()
                     .getContentResolver()
                     .query(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                             projection, selection, selectArgs, null);
@@ -327,7 +328,7 @@ public class MediaUtils {
     }
 
     public static final int deleteVideoFileFromMediaProvider(String videoFile) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr =InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver();
         // video
         int count = 0;
         Cursor videoCursor = null;
@@ -372,7 +373,7 @@ public class MediaUtils {
     }
 
     public static final int deleteVideoInFolderFromMediaProvider(File folder) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr =InfrastructureProvider.INSTANCE.getApplicationContext().getContentResolver();
         // video
         int count = 0;
         Cursor videoCursor = null;
@@ -569,7 +570,7 @@ public class MediaUtils {
     }
 
     private static File getGoogleDriveFile(Context context, Uri uri) throws GDriveConnectionException {
-        if (!Collect.getInstance().isNetworkAvailable()) {
+        if (!CollectInitialiser.INSTANCE.isNetworkAvailable()) {
             throw new GDriveConnectionException();
         }
         if (uri == null) {

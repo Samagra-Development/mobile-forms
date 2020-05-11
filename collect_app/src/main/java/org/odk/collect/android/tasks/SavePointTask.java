@@ -21,7 +21,9 @@ package org.odk.collect.android.tasks;
 import android.os.AsyncTask;
 
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.listeners.SavePointListener;
 import org.odk.collect.android.logic.FormController;
 
@@ -58,7 +60,7 @@ public class SavePointTask extends AsyncTask<Void, Void, String> {
             long start = System.currentTimeMillis();
 
             try {
-                FormController formController = Collect.getInstance().getFormController();
+                FormController formController = CollectInitialiser.INSTANCE.getFormController();
                 File temp = SaveToDiskTask.getSavepointFile(formController.getInstanceFile().getName());
                 ByteArrayPayload payload = formController.getFilledInFormXml();
 

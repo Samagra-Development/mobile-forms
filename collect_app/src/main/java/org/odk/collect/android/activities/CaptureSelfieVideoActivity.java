@@ -29,7 +29,9 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
 import org.odk.collect.android.utilities.CameraUtils;
 import org.odk.collect.android.utilities.ToastUtils;
 import org.odk.collect.android.views.CameraPreview;
@@ -74,7 +76,7 @@ public class CaptureSelfieVideoActivity extends Activity {
         this.camPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Collect.allowClick(getClass().getName())) {
+                if (CollectInitialiser.INSTANCE.allowClick(getClass().getName())) {
                     if (!recording) {
                         // initialize video camera
                         if (prepareVideoRecorder()) {

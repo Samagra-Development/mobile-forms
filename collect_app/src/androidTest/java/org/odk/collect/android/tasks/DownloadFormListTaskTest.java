@@ -1,7 +1,10 @@
 package org.odk.collect.android.tasks;
 
 import org.junit.Test;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.CollectInitialiser;
+import org.odk.collect.android.application.InfrastructureProvider;
+import org.odk.collect.android.application.CollectInitialiser;
 import org.odk.collect.android.logic.FormDetails;
 import org.odk.collect.android.test.MockedServerTest;
 
@@ -22,8 +25,7 @@ public class DownloadFormListTaskTest extends MockedServerTest {
         willRespondWith(RESPONSE);
 
         // when
-        Collect application = Collect.getInstance();
-        DownloadFormListTask task = new DownloadFormListTask(application.getComponent().downloadFormListUtils());
+        DownloadFormListTask task = new DownloadFormListTask(CollectInitialiser.INSTANCE.downloadFormListUtils());
         final Map<String, FormDetails> fetched = task.doInBackground();
 
         // then
