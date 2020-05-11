@@ -1,7 +1,5 @@
 package org.odk.collect.android.application;
 
-import com.squareup.leakcanary.RefWatcher;
-
 /**
  * @author James Knight
  *
@@ -13,8 +11,7 @@ import com.squareup.leakcanary.RefWatcher;
 public class TestCollect extends Collect {
 
     @Override
-    protected RefWatcher setupLeakCanary() {
+    protected void setupLeakCanary() {
         // No leakcanary in unit tests.
-        return RefWatcher.DISABLED;
     }
 }

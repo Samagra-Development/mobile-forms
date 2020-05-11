@@ -100,7 +100,7 @@ public final class GeneralKeys {
     private static HashMap<String, Object> getHashMap() {
         HashMap<String, Object> hashMap = new HashMap<>();
         // aggregate_preferences.xml
-        hashMap.put(KEY_SERVER_URL,                 Collect.getInstance().getString(R.string.default_server_url));
+        hashMap.put(KEY_SERVER_URL,                 Collect.getInstance().getAppContext().getResources().getString(R.string.default_server_url));
         hashMap.put(KEY_USERNAME,                   "");
         hashMap.put(KEY_PASSWORD,                   "");
         // form_management_preferences.xml
@@ -126,19 +126,19 @@ public final class GeneralKeys {
         // identity_preferences.xml
         hashMap.put(KEY_ANALYTICS,                  true);
         // other_preferences.xml
-        hashMap.put(KEY_FORMLIST_URL,               Collect.getInstance().getString(R.string.default_odk_formlist));
-        hashMap.put(KEY_SUBMISSION_URL,             Collect.getInstance().getString(R.string.default_odk_submission));
+        hashMap.put(KEY_FORMLIST_URL,               Collect.getInstance().getAppContext().getResources().getString(R.string.default_odk_formlist));
+        hashMap.put(KEY_SUBMISSION_URL,             Collect.getInstance().getAppContext().getResources().getString(R.string.default_odk_submission));
         // server_preferences.xml
-        hashMap.put(KEY_PROTOCOL,                   Collect.getInstance().getString(R.string.protocol_odk_default));
+        hashMap.put(KEY_PROTOCOL,                   Collect.getInstance().getAppContext().getResources().getString(R.string.protocol_odk_default));
         hashMap.put(KEY_SMS_GATEWAY,                "");
-        hashMap.put(KEY_SUBMISSION_TRANSPORT_TYPE,  Collect.getInstance().getString(R.string.transport_type_value_internet));
+        hashMap.put(KEY_SUBMISSION_TRANSPORT_TYPE,  Collect.getInstance().getAppContext().getResources().getString(R.string.transport_type_value_internet));
         // user_interface_preferences.xml
-        hashMap.put(KEY_APP_THEME,                  Collect.getInstance().getString(R.string.app_theme_light));
+        hashMap.put(KEY_APP_THEME,                  Collect.getInstance().getAppContext().getResources().getString(R.string.app_theme_light));
         hashMap.put(KEY_APP_LANGUAGE,               "");
         hashMap.put(KEY_FONT_SIZE,                  Collect.DEFAULT_FONTSIZE);
         hashMap.put(KEY_NAVIGATION,                 NAVIGATION_SWIPE);
         hashMap.put(KEY_SHOW_SPLASH,                false);
-        hashMap.put(KEY_SPLASH_PATH,                Collect.getInstance().getString(R.string.default_splash_path));
+        hashMap.put(KEY_SPLASH_PATH,                Collect.getInstance().getAppContext().getResources().getString(R.string.default_splash_path));
         hashMap.put(KEY_MAP_SDK,                    GOOGLE_MAPS_BASEMAP_KEY);
         hashMap.put(KEY_MAP_BASEMAP,                GOOGLE_MAPS_BASEMAP_DEFAULT);
         return hashMap;

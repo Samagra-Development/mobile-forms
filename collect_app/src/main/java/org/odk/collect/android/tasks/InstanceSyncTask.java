@@ -83,7 +83,7 @@ public class InstanceSyncTask extends AsyncTask<Void, String, String> {
                 File[] instanceFolders = instancesPath.listFiles();
                 if (instanceFolders == null || instanceFolders.length == 0) {
                     Timber.i("[%d] Empty instance folder. Stopping scan process.", instance);
-                    Timber.d(Collect.getInstance().getString(R.string.instance_scan_completed));
+                    Timber.d(Collect.getInstance().getAppContext().getResources().getString(R.string.instance_scan_completed));
                     return currentStatus;
                 }
 
@@ -141,7 +141,7 @@ public class InstanceSyncTask extends AsyncTask<Void, String, String> {
                 instancesDao.deleteInstancesFromIDs(filesToRemove);
 
                 final boolean instanceSyncFlag = PreferenceManager.getDefaultSharedPreferences(
-                        Collect.getInstance().getApplicationContext()).getBoolean(
+                        Collect.getInstance().getAppContext()).getBoolean(
                         GeneralKeys.KEY_INSTANCE_SYNC, true);
 
                 int counter = 0;
@@ -195,7 +195,7 @@ public class InstanceSyncTask extends AsyncTask<Void, String, String> {
                 }
                 if (counter > 0) {
                     currentStatus += String.format(
-                            Collect.getInstance().getString(R.string.instance_scan_count),
+                            Collect.getInstance().getAppContext().getResources().getString(R.string.instance_scan_count),
                             counter);
                 }
             }

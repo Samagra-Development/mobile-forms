@@ -34,6 +34,6 @@ public class ScreenUtils {
     }
 
     private static DisplayMetrics getDisplayMetrics() {
-        return Collect.getInstance().getResources().getDisplayMetrics();
+        return Collect.getInstance().getAppContext().getResources().getDisplayMetrics();
     }
 }

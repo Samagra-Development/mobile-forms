@@ -68,7 +68,7 @@ public interface AppDependencyComponent {
         AppDependencyComponent build();
     }
 
-    void inject(Collect collect);
+//    void inject(Collect collect);
 
     void inject(SmsService smsService);
 

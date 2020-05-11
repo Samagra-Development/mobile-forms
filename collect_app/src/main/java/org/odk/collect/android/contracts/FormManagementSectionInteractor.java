@@ -85,7 +85,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
         resetActions.add(ResetUtility.ResetAction.RESET_LAYERS);
         resetActions.add(ResetUtility.ResetAction.RESET_CACHE);
         resetActions.add(ResetUtility.ResetAction.RESET_OSM_DROID);
-        Runnable runnable = () -> new ResetUtility().reset(Collect.getInstance().getApplicationContext(), resetActions);
+        Runnable runnable = () -> new ResetUtility().reset(Collect.getInstance().getAppContext(), resetActions);
         new Thread(runnable).start();
     }
 
@@ -98,7 +98,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
         resetActions.add(ResetUtility.ResetAction.RESET_CACHE);
         resetActions.add(ResetUtility.ResetAction.RESET_OSM_DROID);
 
-        List<Integer> failedResetActions = new ResetUtility().reset(Collect.getInstance().getApplicationContext(), resetActions);
+        List<Integer> failedResetActions = new ResetUtility().reset(Collect.getInstance().getAppContext(), resetActions);
         Timber.e("Reset Complete%s", failedResetActions.size());
 
         File dir = new File(Collect.INSTANCES_PATH);

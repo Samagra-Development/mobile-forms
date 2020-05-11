@@ -44,7 +44,7 @@ public class FormsDao {
     }
 
     Cursor getFormsCursor(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return Collect.getInstance().getContentResolver().query(FormsProviderAPI.FormsColumns.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
+        return Collect.getInstance().getApplicationVal().getContentResolver().query(FormsProviderAPI.FormsColumns.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     public Cursor getFormsCursor(String formId, String formVersion) {
@@ -102,7 +102,7 @@ public class FormsDao {
         Uri formUri = newestByFormId ? FormsProviderAPI.FormsColumns.CONTENT_NEWEST_FORMS_BY_FORMID_URI
                 : FormsProviderAPI.FormsColumns.CONTENT_URI;
 
-        return new CursorLoader(Collect.getInstance(), formUri, null, selection, selectionArgs, sortOrder);
+        return new CursorLoader(Collect.getInstance().getAppContext(), formUri, null, selection, selectionArgs, sortOrder);
     }
 
     public Cursor getFormsCursorForFormId(String formId) {
@@ -179,7 +179,7 @@ public class FormsDao {
     }
 
     public void deleteFormsDatabase() {
-        Collect.getInstance().getContentResolver().delete(FormsProviderAPI.FormsColumns.CONTENT_URI, null, null);
+        Collect.getInstance().getApplicationVal().getContentResolver().delete(FormsProviderAPI.FormsColumns.CONTENT_URI, null, null);
     }
 
     public void deleteFormsFromIDs(String[] idsToDelete) {
@@ -190,7 +190,7 @@ public class FormsDao {
         selection.append("? )");
 
         //This will break if the number of forms to delete > SQLITE_MAX_VARIABLE_NUMBER (999)
-        Collect.getInstance().getContentResolver().delete(FormsProviderAPI.FormsColumns.CONTENT_URI, selection.toString(), idsToDelete);
+        Collect.getInstance().getApplicationVal().getContentResolver().delete(FormsProviderAPI.FormsColumns.CONTENT_URI, selection.toString(), idsToDelete);
     }
 
     public void deleteFormsFromMd5Hash(String... hashes) {
@@ -215,7 +215,7 @@ public class FormsDao {
     }
 
     public Uri saveForm(ContentValues values) {
-        return Collect.getInstance().getContentResolver().insert(FormsProviderAPI.FormsColumns.CONTENT_URI, values);
+        return Collect.getInstance().getApplicationVal().getContentResolver().insert(FormsProviderAPI.FormsColumns.CONTENT_URI, values);
     }
 
     public int updateForm(ContentValues values) {
@@ -223,7 +223,7 @@ public class FormsDao {
     }
 
     public int updateForm(ContentValues values, String where, String[] whereArgs) {
-        return Collect.getInstance().getContentResolver().update(FormsProviderAPI.FormsColumns.CONTENT_URI, values, where, whereArgs);
+        return Collect.getInstance().getApplicationVal().getContentResolver().update(FormsProviderAPI.FormsColumns.CONTENT_URI, values, where, whereArgs);
     }
 
     /**

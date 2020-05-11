@@ -276,7 +276,7 @@ abstract class AppListActivity extends CollectAbstractActivity {
 
     private void saveSelectedSortingOrder(int selectedStringOrder) {
         selectedSortingOrder = selectedStringOrder;
-        PreferenceManager.getDefaultSharedPreferences(Collect.getInstance())
+        PreferenceManager.getDefaultSharedPreferences(Collect.getInstance().getAppContext())
                 .edit()
                 .putInt(getSortingOrderKey(), selectedStringOrder)
                 .apply();
@@ -284,7 +284,7 @@ abstract class AppListActivity extends CollectAbstractActivity {
 
     protected void restoreSelectedSortingOrder() {
         selectedSortingOrder = PreferenceManager
-                .getDefaultSharedPreferences(Collect.getInstance())
+                .getDefaultSharedPreferences(Collect.getInstance().getAppContext())
                 .getInt(getSortingOrderKey(), BY_NAME_ASC);
     }
 

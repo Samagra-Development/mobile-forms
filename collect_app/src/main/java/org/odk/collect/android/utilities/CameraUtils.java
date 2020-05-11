@@ -112,8 +112,7 @@ public class CameraUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             try {
                 //https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html
-                CameraManager cameraManager = (CameraManager) Collect.getInstance()
-                        .getSystemService(Context.CAMERA_SERVICE);
+                CameraManager cameraManager = (CameraManager) Collect.getInstance().getApplicationVal().getSystemService(Context.CAMERA_SERVICE);
                 if (cameraManager != null) {
                     String[] cameraId = cameraManager.getCameraIdList();
                     for (String id : cameraId) {

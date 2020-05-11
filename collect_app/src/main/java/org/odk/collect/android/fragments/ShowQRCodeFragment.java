@@ -272,7 +272,7 @@ public class ShowQRCodeFragment extends Fragment {
             @Override
             public void onSuccess() {
                 Collect.getInstance().initProperties();
-                ToastUtils.showLongToast(Collect.getInstance().getString(R.string.successfully_imported_settings));
+                ToastUtils.showLongToast(Collect.getInstance().getAppContext().getResources().getString(R.string.successfully_imported_settings));
                 getActivity().finish();
                 final LocaleHelper localeHelper = new LocaleHelper();
                 localeHelper.updateLocale(getActivity());
@@ -282,7 +282,7 @@ public class ShowQRCodeFragment extends Fragment {
             @Override
             public void onFailure(Exception exception) {
                 if (exception instanceof GeneralSharedPreferences.ValidationException) {
-                    ToastUtils.showLongToast(Collect.getInstance().getString(R.string.invalid_qrcode));
+                    ToastUtils.showLongToast(Collect.getInstance().getAppContext().getResources().getString(R.string.invalid_qrcode));
                 } else {
                     Timber.e(exception);
                 }

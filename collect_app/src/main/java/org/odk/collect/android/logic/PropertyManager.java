@@ -171,7 +171,7 @@ public class PropertyManager implements IPropertyManager {
 
     @Override
     public String getSingularProperty(String propertyName) {
-        if (!isReadPhoneStatePermissionGranted(Collect.getInstance()) && isPropertyDangerous(propertyName)) {
+        if (!isReadPhoneStatePermissionGranted(Collect.getInstance().getAppContext()) && isPropertyDangerous(propertyName)) {
             eventBus.post(new ReadPhoneStatePermissionRxEvent());
         }
 

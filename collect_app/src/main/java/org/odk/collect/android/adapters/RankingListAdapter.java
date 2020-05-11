@@ -93,7 +93,7 @@ public class RankingListAdapter extends Adapter<ItemViewHolder> {
         ItemViewHolder(View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.rank_item_text);
-            textView.setTextSize(Collect.getQuestionFontsize());
+            textView.setTextSize(Collect.getQuestionFontSize());
             themeUtils = new ThemeUtils(itemView.getContext());
         }
 

@@ -91,7 +91,7 @@ public abstract class InstanceUploader {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMITTED);
-        Collect.getInstance().getContentResolver().update(instanceDatabaseUri, contentValues, null, null);
+        Collect.getInstance().getApplicationVal().getContentResolver().update(instanceDatabaseUri, contentValues, null, null);
     }
 
     void saveFailedStatusToDatabase(Instance instance) {
@@ -100,7 +100,7 @@ public abstract class InstanceUploader {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
-        Collect.getInstance().getContentResolver().update(instanceDatabaseUri, contentValues, null, null);
+        Collect.getInstance().getApplicationVal().getContentResolver().update(instanceDatabaseUri, contentValues, null, null);
     }
 
     /**

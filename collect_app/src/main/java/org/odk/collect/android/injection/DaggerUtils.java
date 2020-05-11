@@ -24,6 +24,6 @@ public class DaggerUtils {
     private DaggerUtils() {}
 
     public static AppDependencyComponent getComponent(Activity activity) {
-        return ((Collect) activity.getApplication()).getComponent();
+        return Collect.getInstance().getComponent();
     }
 }

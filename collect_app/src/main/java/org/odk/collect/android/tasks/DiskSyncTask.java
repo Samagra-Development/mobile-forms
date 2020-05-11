@@ -166,7 +166,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
 
                     // update in content provider
                     int count =
-                            Collect.getInstance().getContentResolver()
+                            Collect.getInstance().getApplicationVal().getContentResolver()
                                     .update(updateUri, values, null, null);
                     Timber.i("[%d] %d records successfully updated", instance, count);
                 }
@@ -215,7 +215,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
             if (errors.length() != 0) {
                 statusMessage = errors.toString();
             } else {
-                Timber.d(Collect.getInstance().getString(R.string.finished_disk_scan));
+                Timber.d(Collect.getInstance().getAppContext().getResources().getString(R.string.finished_disk_scan));
             }
             return statusMessage;
         } finally {
@@ -269,7 +269,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
             updateValues.put(FormsColumns.DISPLAY_NAME, title);
         } else {
             throw new IllegalArgumentException(
-                    Collect.getInstance().getString(R.string.xform_parse_error,
+                    Collect.getInstance().getAppContext().getResources().getString(R.string.xform_parse_error,
                             formDefFile.getName(), "title"));
         }
         String formid = fields.get(FileUtils.FORMID);
@@ -277,7 +277,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
             updateValues.put(FormsColumns.JR_FORM_ID, formid);
         } else {
             throw new IllegalArgumentException(
-                    Collect.getInstance().getString(R.string.xform_parse_error,
+                    Collect.getInstance().getAppContext().getResources().getString(R.string.xform_parse_error,
                             formDefFile.getName(), "id"));
         }
         String version = fields.get(FileUtils.VERSION);
@@ -290,7 +290,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
                 updateValues.put(FormsColumns.SUBMISSION_URI, submission);
             } else {
                 throw new IllegalArgumentException(
-                        Collect.getInstance().getString(R.string.xform_parse_error,
+                        Collect.getInstance().getAppContext().getResources().getString(R.string.xform_parse_error,
                                 formDefFile.getName(), "submission url"));
             }
         }

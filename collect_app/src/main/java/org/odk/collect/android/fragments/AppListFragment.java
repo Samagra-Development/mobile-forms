@@ -258,7 +258,7 @@ abstract class AppListFragment extends ListFragment {
 
     private void saveSelectedSortingOrder(int selectedStringOrder) {
         selectedSortingOrder = selectedStringOrder;
-        PreferenceManager.getDefaultSharedPreferences(Collect.getInstance())
+        PreferenceManager.getDefaultSharedPreferences(Collect.getInstance().getAppContext())
                 .edit()
                 .putInt(getSortingOrderKey(), selectedStringOrder)
                 .apply();
@@ -266,7 +266,7 @@ abstract class AppListFragment extends ListFragment {
 
     protected void restoreSelectedSortingOrder() {
         selectedSortingOrder = PreferenceManager
-                .getDefaultSharedPreferences(Collect.getInstance())
+                .getDefaultSharedPreferences(Collect.getInstance().getAppContext())
                 .getInt(getSortingOrderKey(), BY_NAME_ASC);
     }
 

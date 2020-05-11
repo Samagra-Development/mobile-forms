@@ -101,7 +101,7 @@ public class AppDependencyModule {
     @Provides
     @Singleton
     public Tracker providesTracker(Application application) {
-        return ((Collect) application).getDefaultTracker();
+        return Collect.getInstance().getDefaultTracker();
     }
 
     @Provides

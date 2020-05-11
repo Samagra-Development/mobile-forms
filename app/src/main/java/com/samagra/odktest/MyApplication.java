@@ -3,13 +3,16 @@ package com.samagra.odktest;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.ProcessLifecycleOwner;
+import androidx.multidex.MultiDex;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.samagra.ancillaryscreens.AncillaryScreensDriver;
@@ -20,18 +23,24 @@ import com.samagra.commons.InternetMonitor;
 import com.samagra.commons.MainApplication;
 import com.samagra.commons.Modules;
 import com.samagra.commons.RxBus;
+import com.samagra.commons.utils.AlertDialogUtils;
 import com.samagra.odktest.di.component.ApplicationComponent;
 import com.samagra.odktest.di.component.DaggerApplicationComponent;
 import com.samagra.odktest.di.modules.ApplicationModule;
 
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.application.Informer;
 import org.odk.collect.android.contracts.ComponentManager;
 import org.odk.collect.android.contracts.FormManagementSectionInteractor;
+import org.odk.collect.android.preferences.GeneralSharedPreferences;
+import org.odk.collect.android.utilities.LocaleHelper;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
+
+import static org.odk.collect.android.preferences.GeneralKeys.KEY_APP_LANGUAGE;
 
 /**
  * The {@link Application} class for the app. This extends {@link Application} because the app module has a dependency on
@@ -41,7 +50,7 @@ import timber.log.Timber;
  * @author Pranav Sharma
  * @see MainApplication
  */
-public class MyApplication extends Collect implements MainApplication, LifecycleObserver {
+public class MyApplication extends Application implements MainApplication, LifecycleObserver {
 
     protected ApplicationComponent applicationComponent;
 
@@ -60,6 +69,18 @@ public class MyApplication extends Collect implements MainApplication, Lifecycle
     @Override
     public void onCreate() {
         super.onCreate();
+        Collect.getInstance().init(this, getApplicationContext(), new Informer() {
+            @Override
+            public void onSuccess() {
+               Timber.d("Form Module has been initialised correctly");
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Timber.d("Form Module could not be initialised correctly");
+                AlertDialogUtils.createErrorDialog(getApplicationContext(), "Could not start app as Form Module couldn't be initialised properly.", true);
+            }
+        });
         eventBus = new RxBus();
         setupRemoteConfig();
         setupActivityLifecycleListeners();
@@ -113,6 +134,7 @@ public class MyApplication extends Collect implements MainApplication, Lifecycle
         applicationComponent = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .build();
+        MultiDex.install(this);
         applicationComponent.inject(this);
     }
 
@@ -200,6 +222,7 @@ public class MyApplication extends Collect implements MainApplication, Lifecycle
     }
 
     public void setupRemoteConfig() {
+        FirebaseApp.initializeApp(this);
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
                 .setMinimumFetchIntervalInSeconds(1)
@@ -211,9 +234,17 @@ public class MyApplication extends Collect implements MainApplication, Lifecycle
                 Timber.e("Remote config activate failed.");
             }
         }));
-
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Collect.defaultSysLanguage = newConfig.locale.getLanguage();
+        boolean isUsingSysLanguage = GeneralSharedPreferences.getInstance().get(KEY_APP_LANGUAGE).equals("");
+        if (!isUsingSysLanguage) {
+            new LocaleHelper().updateLocale(this);
+        }
+    }
     public static FirebaseRemoteConfig getmFirebaseRemoteConfig() {
         return mFirebaseRemoteConfig;
     }

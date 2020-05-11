@@ -301,7 +301,7 @@ public class InstanceProvider extends ContentProvider {
                     if (status != null && status.equals(InstanceProviderAPI.STATUS_SUBMITTED)) {
                         ContentValues cv = new ContentValues();
                         cv.put(InstanceColumns.DELETED_DATE, System.currentTimeMillis());
-                        count = Collect.getInstance().getContentResolver().update(uri, cv, null, null);
+                        count = Collect.getInstance().getApplicationVal().getContentResolver().update(uri, cv, null, null);
                     } else {
                         String[] newWhereArgs;
                         if (whereArgs == null || whereArgs.length == 0) {

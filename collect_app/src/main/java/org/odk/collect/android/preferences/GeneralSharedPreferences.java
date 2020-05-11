@@ -35,7 +35,7 @@ public class GeneralSharedPreferences {
     private final android.content.SharedPreferences sharedPreferences;
 
     private GeneralSharedPreferences() {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance().getAppContext());
     }
 
     public static synchronized GeneralSharedPreferences getInstance() {

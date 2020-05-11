@@ -127,7 +127,7 @@ public abstract class QuestionWidget
             }
         });
 
-        questionFontSize = Collect.getQuestionFontsize();
+        questionFontSize = Collect.getQuestionFontSize();
 
         formEntryPrompt = prompt;
 

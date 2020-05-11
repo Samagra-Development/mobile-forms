@@ -33,7 +33,7 @@ public final class ContentResolverHelper {
     }
 
     private static ContentResolver getContentResolver() {
-        return Collect.getInstance().getContentResolver();
+        return Collect.getInstance().getApplicationVal().getContentResolver();
     }
 
     public static FormInfo getFormDetails(Uri uri) {

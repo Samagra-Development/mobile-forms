@@ -24,7 +24,7 @@ import org.odk.collect.android.activities.CollectAbstractActivity;
  *
  * @author Pranav Sharma
  */
-public abstract class BaseActivity extends CollectAbstractActivity implements MvpView {
+public abstract class BaseActivity extends AppCompatActivity implements MvpView {
 
     private ActivityComponent activityComponent;
 

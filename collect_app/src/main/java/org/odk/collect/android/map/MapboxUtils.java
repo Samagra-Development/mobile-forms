@@ -27,7 +27,7 @@ public class MapboxUtils {
         // To use the Mapbox base maps, we have to initialize the Mapbox SDK with
         // an access token. Configure this token in collect_app/secrets.properties.
         try {
-            mapbox = Mapbox.getInstance(Collect.getInstance(), BuildConfig.MAPBOX_ACCESS_TOKEN);
+            mapbox = Mapbox.getInstance(Collect.getInstance().getAppContext(), BuildConfig.MAPBOX_ACCESS_TOKEN);
         } catch (Exception | Error e) {
             // Initialization failed (usually because the Mapbox native library for
             // the current architecture could not be found or loaded).

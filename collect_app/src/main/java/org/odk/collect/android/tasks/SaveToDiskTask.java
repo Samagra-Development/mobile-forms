@@ -83,7 +83,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
 
         FormController formController = Collect.getInstance().getFormController();
 
-        publishProgress(Collect.getInstance().getString(R.string.survey_saving_validating_message));
+        publishProgress(Collect.getInstance().getAppContext().getResources().getString(R.string.survey_saving_validating_message));
 
         try {
             int validateStatus = formController.validateAnswers(markCompleted);
@@ -161,9 +161,9 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
         values.put(InstanceColumns.CAN_EDIT_WHEN_COMPLETE, Boolean.toString(canEditAfterCompleted));
 
         // If FormEntryActivity was started with an Instance, just update that instance
-        if (Collect.getInstance().getContentResolver().getType(uri).equals(
+        if (Collect.getInstance().getApplicationVal().getContentResolver().getType(uri).equals(
                 InstanceColumns.CONTENT_ITEM_TYPE)) {
-            int updated = Collect.getInstance().getContentResolver().update(uri, values, null,
+            int updated = Collect.getInstance().getApplicationVal().getContentResolver().update(uri, values, null,
                     null);
             if (updated > 1) {
                 Timber.w("Updated more than one entry, that's not good: %s", uri.toString());
@@ -172,7 +172,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
             } else {
                 Timber.e("Instance doesn't exist but we have its Uri!! %s", uri.toString());
             }
-        } else if (Collect.getInstance().getContentResolver().getType(uri).equals(
+        } else if (Collect.getInstance().getApplicationVal().getContentResolver().getType(uri).equals(
                 FormsColumns.CONTENT_ITEM_TYPE)) {
             // If FormEntryActivity was started with a form, then it's likely the first time we're
             // saving.
@@ -196,7 +196,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
                 Cursor c = null;
                 try {
                     // retrieve the form definition...
-                    c = Collect.getInstance().getContentResolver().query(uri, null, null, null,
+                    c = Collect.getInstance().getApplicationVal().getContentResolver().query(uri, null, null, null,
                             null);
                     c.moveToFirst();
                     String formname = c.getString(c.getColumnIndex(FormsColumns.DISPLAY_NAME));
@@ -258,7 +258,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
     private void exportData(boolean markCompleted) throws IOException, EncryptionException {
         FormController formController = Collect.getInstance().getFormController();
 
-        publishProgress(Collect.getInstance().getString(R.string.survey_saving_collecting_message));
+        publishProgress(Collect.getInstance().getAppContext().getResources().getString(R.string.survey_saving_collecting_message));
 
         ByteArrayPayload payload = formController.getFilledInFormXml();
         // write out xml
@@ -266,7 +266,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
 
         MediaManager.INSTANCE.saveChanges();
 
-        publishProgress(Collect.getInstance().getString(R.string.survey_saving_saving_message));
+        publishProgress(Collect.getInstance().getAppContext().getResources().getString(R.string.survey_saving_saving_message));
 
         writeFile(payload, instancePath);
 
@@ -302,7 +302,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
             // write out submission.xml -- the data to actually submit to aggregate
 
             publishProgress(
-                    Collect.getInstance().getString(R.string.survey_saving_finalizing_message));
+                    Collect.getInstance().getAppContext().getResources().getString(R.string.survey_saving_finalizing_message));
 
             writeFile(payload, submissionXml.getAbsolutePath());
 
@@ -315,7 +315,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
                 // and encrypt the submission (this is a one-way operation)...
 
                 publishProgress(
-                        Collect.getInstance().getString(R.string.survey_saving_encrypting_message));
+                        Collect.getInstance().getAppContext().getResources().getString(R.string.survey_saving_encrypting_message));
 
                 EncryptionUtils.generateEncryptedSubmission(instanceXml, submissionXml, formInfo);
                 isEncrypted = true;

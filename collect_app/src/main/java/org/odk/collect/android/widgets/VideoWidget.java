@@ -374,7 +374,7 @@ public class VideoWidget extends QuestionWidget implements FileWidget {
         }
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(Collect
-                .getInstance());
+                .getInstance().getAppContext());
 
         // request high resolution if configured for that...
         boolean highResolution = settings.getBoolean(

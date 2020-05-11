@@ -277,7 +277,7 @@ public class ODKView extends FrameLayout implements OnLongClickListener, WidgetV
         if (!path.isEmpty()) {
             TextView tv = new TextView(getContext());
             tv.setText(path);
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Collect.getQuestionFontsize() - 4);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, Collect.getQuestionFontSize() - 4);
             tv.setPadding(0, 0, 0, 5);
             view.addView(tv, layout);
         }
@@ -346,7 +346,7 @@ public class ODKView extends FrameLayout implements OnLongClickListener, WidgetV
         launchIntentButton.setId(ViewIds.generateViewId());
         launchIntentButton.setText(buttonText);
         launchIntentButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
-                Collect.getQuestionFontsize() + 2);
+                Collect.getQuestionFontSize() + 2);
         launchIntentButton.setPadding(20, 20, 20, 20);
         launchIntentButton.setLayoutParams(params);
 

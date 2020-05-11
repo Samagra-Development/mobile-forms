@@ -759,7 +759,7 @@ public class FormDownloadList extends FormListActivity implements FormListDownlo
         if (viewModel.isDownloadOnlyMode()) {
             for (FormDetails formDetails: result.keySet()) {
                 String successKey = result.get(formDetails);
-                if (Collect.getInstance().getString(R.string.success).equals(successKey)) {
+                if (Collect.getInstance().getAppContext().getResources().getString(R.string.success).equals(successKey)) {
                     if (viewModel.getFormResults().containsKey(formDetails.getFormID())) {
                         viewModel.putFormResult(formDetails.getFormID(), true);
                     }
@@ -776,7 +776,7 @@ public class FormDownloadList extends FormListActivity implements FormListDownlo
         for (FormDetails k : keys) {
             b.append(k.getFormName() + " ("
                     + ((k.getFormVersion() != null)
-                    ? (Collect.getInstance().getString(R.string.version) + ": " + k.getFormVersion() + " ")
+                    ? (Collect.getInstance().getAppContext().getResources().getString(R.string.version) + ": " + k.getFormVersion() + " ")
                     : "") + "ID: " + k.getFormID() + ") - " + result.get(k));
             b.append("\n\n");
         }

@@ -29,7 +29,7 @@ public class DatabaseContext extends ContextWrapper {
     private final String path;
 
     public DatabaseContext(String path) {
-        super(Collect.getInstance());
+        super(Collect.getInstance().getAppContext());
         this.path = path;
     }
 

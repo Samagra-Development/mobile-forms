@@ -125,7 +125,7 @@ public class MapboxMapFragment extends MapFragment implements org.odk.collect.an
 
     @Override public void addTo(@NonNull FragmentActivity activity, int containerId, @Nullable ReadyListener listener) {
         if (MapboxUtils.initMapbox() == null) {
-            MapboxUtils.warnMapboxUnsupported(Collect.getInstance());
+            MapboxUtils.warnMapboxUnsupported(Collect.getInstance().getAppContext());
             if (listener != null) {
                 listener.onReady(null);
             }

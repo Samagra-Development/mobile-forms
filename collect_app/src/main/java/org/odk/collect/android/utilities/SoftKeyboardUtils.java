@@ -39,6 +39,6 @@ public class SoftKeyboardUtils {
     }
 
     private static InputMethodManager getInputMethodManager() {
-        return (InputMethodManager) Collect.getInstance().getSystemService(Context.INPUT_METHOD_SERVICE);
+        return (InputMethodManager) Collect.getInstance().getApplicationVal().getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 }

@@ -16,6 +16,7 @@
 
 package org.odk.collect.android.utilities;
 
+import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -34,7 +35,7 @@ public class NotificationUtils {
     private NotificationUtils() {
     }
 
-    public static void createNotificationChannel(Collect collect) {
+    public static void createNotificationChannel(Application collect) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager notificationManager = collect.getSystemService(NotificationManager.class);
 
@@ -52,7 +53,7 @@ public class NotificationUtils {
                                         int notificationId,
                                         int title,
                                         String contentText) {
-        Context context = Collect.getInstance();
+        Context context = Collect.getInstance().getAppContext();
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID).setContentIntent(contentIntent);
 

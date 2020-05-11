@@ -58,7 +58,7 @@ public class InstanceServerUploaderTask extends InstanceUploaderTask {
         InstanceServerUploader uploader = new InstanceServerUploader(httpInterface, webCredentialsUtils, new HashMap<>());
         List<Instance> instancesToUpload = uploader.getInstancesFromIds(instanceIdsToUpload);
 
-        String deviceId = new PropertyManager(Collect.getInstance().getApplicationContext())
+        String deviceId = new PropertyManager(Collect.getInstance().getAppContext())
                     .getSingularProperty(PropertyManager.withUri(PropertyManager.PROPMGR_DEVICE_ID));
 
         for (int i = 0; i < instancesToUpload.size(); i++) {
@@ -73,7 +73,7 @@ public class InstanceServerUploaderTask extends InstanceUploaderTask {
                 String destinationUrl = uploader.getUrlToSubmitTo(instance, deviceId, completeDestinationUrl);
                 String customMessage = uploader.uploadOneSubmission(instance, destinationUrl);
                 outcome.messagesByInstanceId.put(instance.getDatabaseId().toString(),
-                        customMessage != null ? customMessage : Collect.getInstance().getString(R.string.success));
+                        customMessage != null ? customMessage : Collect.getInstance().getAppContext().getResources().getString(R.string.success));
 
                 Collect.getInstance().logRemoteAnalytics("Submission", "HTTP", Collect.getFormIdentifierHash(instance.getJrFormId(), instance.getJrVersion()));
             } catch (UploadAuthRequestedException e) {

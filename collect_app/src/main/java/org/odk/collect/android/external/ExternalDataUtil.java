@@ -121,33 +121,33 @@ public final class ExternalDataUtil {
                                 || xpathFuncExpr.args.length == 6) {
                             return xpathFuncExpr;
                         } else {
-                            Toast.makeText(Collect.getInstance(),
-                                    Collect.getInstance().getString(R.string.ext_search_wrong_arguments_error),
+                            Toast.makeText(Collect.getInstance().getAppContext(),
+                                    Collect.getInstance().getAppContext().getResources().getString(R.string.ext_search_wrong_arguments_error),
                                     Toast.LENGTH_SHORT).show();
-                            Timber.i(Collect.getInstance().getString(R.string.ext_search_wrong_arguments_error));
+                            Timber.i(Collect.getInstance().getAppContext().getResources().getString(R.string.ext_search_wrong_arguments_error));
                             return null;
                         }
                     } else {
                         // this might mean a problem in the regex above. Unit tests required.
-                        Toast.makeText(Collect.getInstance(),
-                                Collect.getInstance().getString(R.string.ext_search_wrong_function_error, xpathFuncExpr.id.name),
+                        Toast.makeText(Collect.getInstance().getAppContext(),
+                                Collect.getInstance().getAppContext().getResources().getString(R.string.ext_search_wrong_function_error, xpathFuncExpr.id.name),
                                 Toast.LENGTH_SHORT).show();
-                        Timber.i(Collect.getInstance().getString(R.string.ext_search_wrong_function_error, xpathFuncExpr.id.name));
+                        Timber.i(Collect.getInstance().getAppContext().getResources().getString(R.string.ext_search_wrong_function_error, xpathFuncExpr.id.name));
                         return null;
                     }
                 } else {
                     // this might mean a problem in the regex above. Unit tests required.
-                    Toast.makeText(Collect.getInstance(),
-                            Collect.getInstance().getString(R.string.ext_search_bad_function_error, function),
+                    Toast.makeText(Collect.getInstance().getAppContext(),
+                            Collect.getInstance().getAppContext().getResources().getString(R.string.ext_search_bad_function_error, function),
                             Toast.LENGTH_SHORT).show();
-                    Timber.i(Collect.getInstance().getString(R.string.ext_search_bad_function_error, function));
+                    Timber.i(Collect.getInstance().getAppContext().getResources().getString(R.string.ext_search_bad_function_error, function));
                     return null;
                 }
             } catch (XPathSyntaxException e) {
-                Toast.makeText(Collect.getInstance(),
-                        Collect.getInstance().getString(R.string.ext_search_generic_error, appearance),
+                Toast.makeText(Collect.getInstance().getAppContext(),
+                        Collect.getInstance().getAppContext().getResources().getString(R.string.ext_search_generic_error, appearance),
                         Toast.LENGTH_SHORT).show();
-                Timber.i(Collect.getInstance().getString(R.string.ext_search_generic_error, appearance));
+                Timber.i(Collect.getInstance().getAppContext().getResources().getString(R.string.ext_search_generic_error, appearance));
                 return null;
             }
         } else {
@@ -198,7 +198,7 @@ public final class ExternalDataUtil {
                         }
                     } else {
                         throw new ExternalDataException(
-                                Collect.getInstance().getString(R.string.ext_search_return_error,
+                                Collect.getInstance().getAppContext().getResources().getString(R.string.ext_search_return_error,
                                         eval.getClass().getName()));
                     }
                 }

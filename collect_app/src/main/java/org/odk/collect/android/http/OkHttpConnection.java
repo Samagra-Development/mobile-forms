@@ -112,7 +112,7 @@ public class OkHttpConnection implements OpenRosaHttpInterface {
         if (statusCode != HttpURLConnection.HTTP_OK) {
             discardEntityBytes(response);
             String errMsg = Collect
-                    .getInstance()
+                    .getInstance().getAppContext().getResources()
                     .getString(R.string.file_fetch_failed, uri.toString(), response.message(), String.valueOf(statusCode));
 
             Timber.e(errMsg);

@@ -175,7 +175,7 @@ public class InstanceUploaderActivity extends CollectAbstractActivity implements
             instanceServerUploaderTask = new InstanceServerUploaderTask();
 
             if (url != null) {
-                instanceServerUploaderTask.setCompleteDestinationUrl(url + Collect.getInstance().getString(R.string.default_odk_submission));
+                instanceServerUploaderTask.setCompleteDestinationUrl(url + Collect.getInstance().getAppContext().getResources().getString(R.string.default_odk_submission));
 
                 if (deleteInstanceAfterUpload != null) {
                     instanceServerUploaderTask.setDeleteInstanceAfterSubmission(deleteInstanceAfterUpload);
@@ -404,7 +404,7 @@ public class InstanceUploaderActivity extends CollectAbstractActivity implements
         // TODO: is this really needed here? When would the task not have gotten a server set in
         // init already?
         if (url != null) {
-            instanceServerUploaderTask.setCompleteDestinationUrl(url + Collect.getInstance().getString(R.string.default_odk_submission), false);
+            instanceServerUploaderTask.setCompleteDestinationUrl(url + Collect.getInstance().getAppContext().getResources().getString(R.string.default_odk_submission), false);
         }
         instanceServerUploaderTask.execute(instancesToSend);
     }

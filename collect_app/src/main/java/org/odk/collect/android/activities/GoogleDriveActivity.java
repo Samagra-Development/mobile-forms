@@ -795,7 +795,7 @@ public class GoogleDriveActivity extends FormListActivity implements View.OnClic
 
                 try {
                     downloadFile(fileItem.getDriveId(), fileItem.getName());
-                    results.put(fileItem.getName(), Collect.getInstance().getString(R.string.success));
+                    results.put(fileItem.getName(), Collect.getInstance().getAppContext().getResources().getString(R.string.success));
 
                     String mediaDirName = FileUtils.constructMediaPath(fileItem.getName());
 
@@ -816,7 +816,7 @@ public class GoogleDriveActivity extends FormListActivity implements View.OnClic
                         for (com.google.api.services.drive.model.File mediaFile : mediaFileList) {
                             String filePath = mediaDirName + File.separator + mediaFile.getName();
                             downloadFile(mediaFile.getId(), filePath);
-                            results.put(filePath, Collect.getInstance().getString(R.string.success));
+                            results.put(filePath, Collect.getInstance().getAppContext().getResources().getString(R.string.success));
                         }
                     }
                 } catch (Exception e) {

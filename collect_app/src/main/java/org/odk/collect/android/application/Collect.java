@@ -18,7 +18,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -29,7 +28,6 @@ import android.preference.PreferenceManager;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.multidex.MultiDex;
 
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobManagerCreateException;
@@ -40,7 +38,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.security.ProviderInstaller;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -72,7 +69,6 @@ import timber.log.Timber;
 
 import static org.odk.collect.android.logic.PropertyManager.PROPMGR_USERNAME;
 import static org.odk.collect.android.logic.PropertyManager.SCHEME_USERNAME;
-import static org.odk.collect.android.preferences.GeneralKeys.KEY_APP_LANGUAGE;
 import static org.odk.collect.android.preferences.GeneralKeys.KEY_FONT_SIZE;
 import static org.odk.collect.android.preferences.GeneralKeys.KEY_USERNAME;
 import static org.odk.collect.android.tasks.sms.SmsNotificationReceiver.SMS_NOTIFICATION_ACTION;
@@ -83,7 +79,7 @@ import static org.odk.collect.android.tasks.sms.SmsSender.SMS_SEND_ACTION;
  *
  * @author carlhartung
  */
-public class Collect extends Application {
+public class Collect {
 
     // Storage paths
     public static final String ODK_ROOT = Environment.getExternalStorageDirectory()
@@ -95,14 +91,12 @@ public class Collect extends Application {
     public static final String TMPFILE_PATH = CACHE_PATH + File.separator + "tmp.jpg";
     public static final String TMPDRAWFILE_PATH = CACHE_PATH + File.separator + "tmpDraw.jpg";
     public static final String DEFAULT_FONTSIZE = "21";
-    public static final int DEFAULT_FONTSIZE_INT = 21;
+    private static final int DEFAULT_FONTSIZE_INT = 21;
     public static final String OFFLINE_LAYERS = ODK_ROOT + File.separator + "layers";
     public static final String SETTINGS = ODK_ROOT + File.separator + "settings";
-
-    public static final int CLICK_DEBOUNCE_MS = 1000;
+    private static final int CLICK_DEBOUNCE_MS = 1000;
 
     public static String defaultSysLanguage;
-    private static Collect singleton;
     private static long lastClickTime;
     private static String lastClickName;
 
@@ -113,17 +107,113 @@ public class Collect extends Application {
     private FirebaseAnalytics firebaseAnalytics;
     private AppDependencyComponent applicationComponent;
 
+    private static Collect singleton = null;
+    private static Application applicationVal = null;
+    private static Context appContext =null;
+
     public static Collect getInstance() {
+        if (singleton == null)
+            singleton = new Collect();
         return singleton;
     }
 
-    public static int getQuestionFontsize() {
+    public Application getApplicationVal() {
+        return applicationVal;
+    }
+
+    public Context getAppContext() {
+        return appContext;
+    }
+
+
+    public void init(Application application, Context context, Informer informer) {
+        if(application != null && context != null) {
+            applicationVal = application;
+            appContext = context;
+            firebaseAnalytics = FirebaseAnalytics.getInstance(appContext);
+            installTls12();
+            setupDagger();
+            NotificationUtils.createNotificationChannel(applicationVal);
+            appContext.registerReceiver(new SmsSentBroadcastReceiver(), new IntentFilter(SMS_SEND_ACTION));
+            appContext.registerReceiver(new SmsNotificationReceiver(), new IntentFilter(SMS_NOTIFICATION_ACTION));
+            try {
+                JobManager
+                        .create(appContext)
+                        .addJobCreator(new CollectJobCreator());
+            } catch (JobManagerCreateException e) {
+                Timber.e(e);
+            }
+            reloadSharedPreferences();
+            PRNGFixes.apply();
+            AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+            JodaTimeAndroid.init(appContext);
+            defaultSysLanguage = Locale.getDefault().getLanguage();
+            new LocaleHelper().updateLocale(appContext);
+            FormMetadataMigrator.migrate(PreferenceManager.getDefaultSharedPreferences(appContext));
+            AutoSendPreferenceMigrator.migrate();
+            initProperties();
+            Timber.plant(new Timber.DebugTree());
+            setupLeakCanary();
+            informer.onSuccess();
+        }else{
+            informer.onFailure("Failed");
+        }
+    }
+
+    private void installTls12() {
+        if (Build.VERSION.SDK_INT <= 20) {
+            ProviderInstaller.installIfNeededAsync(appContext, new ProviderInstaller.ProviderInstallListener() {
+                @Override
+                public void onProviderInstalled() {
+                }
+
+                @Override
+                public void onProviderInstallFailed(int i, Intent intent) {
+                    GoogleApiAvailability
+                            .getInstance()
+                            .showErrorNotification(appContext, i);
+                }
+            });
+        }
+    }
+
+    private void setupDagger() {
+        applicationComponent = DaggerAppDependencyComponent.builder()
+                .application(applicationVal)
+                .build();
+//        applicationComponent.inject(this);
+    }
+
+    // This method reloads shared preferences in order to load default values for new preferences
+    private void reloadSharedPreferences() {
+        GeneralSharedPreferences.getInstance().reloadPreferences();
+        AdminSharedPreferences.getInstance().reloadPreferences();
+    }
+
+    public void initProperties() {
+        PropertyManager mgr = new PropertyManager(appContext);
+        // Use the server username by default if the metadata username is not defined
+        if (mgr.getSingularProperty(PROPMGR_USERNAME) == null || mgr.getSingularProperty(PROPMGR_USERNAME).isEmpty()) {
+            mgr.putProperty(PROPMGR_USERNAME, SCHEME_USERNAME, (String) GeneralSharedPreferences.getInstance().get(KEY_USERNAME));
+        }
+        FormController.initializeJavaRosa(mgr);
+    }
+
+    protected void setupLeakCanary() {
+        if(BuildConfig.DEBUG) {
+            if (LeakCanary.isInAnalyzerProcess(appContext)) {
+                return;
+            }
+            LeakCanary.install(applicationVal);
+        }
+    }
+
+    public static int getQuestionFontSize() {
         // For testing:
         Collect instance = Collect.getInstance();
         if (instance == null) {
             return Collect.DEFAULT_FONTSIZE_INT;
         }
-
         return Integer.parseInt(String.valueOf(GeneralSharedPreferences.getInstance().get(KEY_FONT_SIZE)));
     }
 
@@ -136,7 +226,7 @@ public class Collect extends Application {
         String cardstatus = Environment.getExternalStorageState();
         if (!cardstatus.equals(Environment.MEDIA_MOUNTED)) {
             throw new RuntimeException(
-                    Collect.getInstance().getString(R.string.sdcard_unmounted, cardstatus));
+                    Collect.getInstance().getAppContext().getResources().getString(R.string.sdcard_unmounted, cardstatus));
         }
 
         String[] dirs = {
@@ -147,13 +237,13 @@ public class Collect extends Application {
             File dir = new File(dirName);
             if (!dir.exists()) {
                 if (!dir.mkdirs()) {
-                    String message = getInstance().getString(R.string.cannot_create_directory, dirName);
+                    String message = getInstance().getAppContext().getResources().getString(R.string.cannot_create_directory, dirName);
                     Timber.w(message);
                     throw new RuntimeException(message);
                 }
             } else {
                 if (!dir.isDirectory()) {
-                    String message = getInstance().getString(R.string.not_a_directory, dirName);
+                    String message = getInstance().getAppContext().getResources().getString(R.string.not_a_directory, dirName);
                     Timber.w(message);
                     throw new RuntimeException(message);
                 }
@@ -175,9 +265,7 @@ public class Collect extends Application {
             dirPath = dirPath.substring(Collect.ODK_ROOT.length());
             String[] parts = dirPath.split(File.separatorChar == '\\' ? "\\\\" : File.separator);
             // [appName, instances, tableId, instanceId ]
-            if (parts.length == 4 && parts[1].equals("instances")) {
-                return true;
-            }
+            return parts.length == 4 && parts[1].equals("instances");
         }
         return false;
     }
@@ -202,109 +290,14 @@ public class Collect extends Application {
     public String getVersionedAppName() {
         String versionName = BuildConfig.VERSION_NAME;
         versionName = " " + versionName.replaceFirst("-", "\n");
-        return getString(R.string.app_name) + versionName;
+        return Collect.getInstance().getAppContext().getResources().getString(R.string.app_name) + versionName;
     }
 
     public boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getInstance()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
+                .getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo currentNetworkInfo = manager.getActiveNetworkInfo();
         return currentNetworkInfo != null && currentNetworkInfo.isConnected();
-    }
-
-    /*
-        Adds support for multidex support library. For more info check out the link below,
-        https://developer.android.com/studio/build/multidex.html
-    */
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        MultiDex.install(this);
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        singleton = this;
-        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
-        installTls12();
-        setupDagger();
-
-        NotificationUtils.createNotificationChannel(singleton);
-
-        registerReceiver(new SmsSentBroadcastReceiver(), new IntentFilter(SMS_SEND_ACTION));
-        registerReceiver(new SmsNotificationReceiver(), new IntentFilter(SMS_NOTIFICATION_ACTION));
-
-        try {
-            JobManager
-                    .create(this)
-                    .addJobCreator(new CollectJobCreator());
-        } catch (JobManagerCreateException e) {
-            Timber.e(e);
-        }
-
-        reloadSharedPreferences();
-
-        PRNGFixes.apply();
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-        JodaTimeAndroid.init(this);
-
-        defaultSysLanguage = Locale.getDefault().getLanguage();
-        new LocaleHelper().updateLocale(this);
-
-        FormMetadataMigrator.migrate(PreferenceManager.getDefaultSharedPreferences(this));
-        AutoSendPreferenceMigrator.migrate();
-
-        initProperties();
-
-        Timber.plant(new Timber.DebugTree());
-
-        setupLeakCanary();
-    }
-
-    private void setupDagger() {
-        applicationComponent = DaggerAppDependencyComponent.builder()
-                .application(this)
-                .build();
-
-        applicationComponent.inject(this);
-    }
-
-    private void installTls12() {
-        if (Build.VERSION.SDK_INT <= 20) {
-            ProviderInstaller.installIfNeededAsync(getApplicationContext(), new ProviderInstaller.ProviderInstallListener() {
-                @Override
-                public void onProviderInstalled() {
-                }
-
-                @Override
-                public void onProviderInstallFailed(int i, Intent intent) {
-                    GoogleApiAvailability
-                            .getInstance()
-                            .showErrorNotification(getApplicationContext(), i);
-                }
-            });
-        }
-    }
-
-    protected RefWatcher setupLeakCanary() {
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            return RefWatcher.DISABLED;
-        }
-        return LeakCanary.install(this);
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        //noinspection deprecation
-        defaultSysLanguage = newConfig.locale.getLanguage();
-        boolean isUsingSysLanguage = GeneralSharedPreferences.getInstance().get(KEY_APP_LANGUAGE).equals("");
-        if (!isUsingSysLanguage) {
-            new LocaleHelper().updateLocale(this);
-        }
     }
 
     /**
@@ -314,7 +307,7 @@ public class Collect extends Application {
      */
     public synchronized Tracker getDefaultTracker() {
         if (tracker == null) {
-            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(getAppContext());
             tracker = analytics.newTracker("203998633");
         }
         return tracker;
@@ -341,23 +334,6 @@ public class Collect extends Application {
         firebaseAnalytics.setAnalyticsCollectionEnabled(isAnalyticsEnabled);
     }
 
-    public void initProperties() {
-        PropertyManager mgr = new PropertyManager(this);
-
-        // Use the server username by default if the metadata username is not defined
-        if (mgr.getSingularProperty(PROPMGR_USERNAME) == null || mgr.getSingularProperty(PROPMGR_USERNAME).isEmpty()) {
-            mgr.putProperty(PROPMGR_USERNAME, SCHEME_USERNAME, (String) GeneralSharedPreferences.getInstance().get(KEY_USERNAME));
-        }
-
-        FormController.initializeJavaRosa(mgr);
-    }
-
-    // This method reloads shared preferences in order to load default values for new preferences
-    private void reloadSharedPreferences() {
-        GeneralSharedPreferences.getInstance().reloadPreferences();
-        AdminSharedPreferences.getInstance().reloadPreferences();
-    }
-
     // Debounce multiple clicks within the same screen
     public static boolean allowClick(String className) {
         long elapsedRealtime = SystemClock.elapsedRealtime();
@@ -378,7 +354,6 @@ public class Collect extends Application {
 
     public void setComponent(AppDependencyComponent applicationComponent) {
         this.applicationComponent = applicationComponent;
-        applicationComponent.inject(this);
     }
 
     /**

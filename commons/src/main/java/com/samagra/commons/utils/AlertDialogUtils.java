@@ -3,6 +3,7 @@ package com.samagra.commons.utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 
 import androidx.annotation.NonNull;
@@ -61,6 +62,31 @@ public class AlertDialogUtils {
         };
         alertDialog.setCancelable(false);
         alertDialog.setButton(BUTTON_POSITIVE, activity.getString(R.string.ok), errorListener);
+
+        return alertDialog;
+    }
+
+
+    /**
+     * Creates an error dialog on an activity
+     *
+     * @param context Context Instance
+     * @param errorMsg The message to show on the dialog box
+     * @param shouldExit Finish the activity if Ok is clicked
+     */
+    public static Dialog createErrorDialog(@NonNull Context context, String errorMsg, final boolean shouldExit) {
+        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+        alertDialog.setIcon(android.R.drawable.ic_dialog_info);
+        alertDialog.setMessage(errorMsg);
+        DialogInterface.OnClickListener errorListener = (dialog, i) -> {
+            if (i == BUTTON_POSITIVE) {
+                if (shouldExit) {
+                    System.exit(0);
+                }
+            }
+        };
+        alertDialog.setCancelable(false);
+        alertDialog.setButton(BUTTON_POSITIVE, context.getResources().getString(R.string.ok), errorListener);
 
         return alertDialog;
     }

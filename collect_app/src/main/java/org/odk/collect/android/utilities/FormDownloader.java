@@ -99,7 +99,7 @@ public class FormDownloader {
             try {
                 String message = processOneForm(total, count++, fd);
                 result.put(fd, message.isEmpty() ?
-                        Collect.getInstance().getString(R.string.success) : message);
+                        Collect.getInstance().getAppContext().getResources().getString(R.string.success) : message);
             } catch (TaskCancelledException cd) {
                 break;
             }
@@ -182,12 +182,12 @@ public class FormDownloader {
             if (isSubmissionOk(parsedFields)) {
                 installed = installEverything(tempMediaPath, fileResult, parsedFields);
             } else {
-                message += Collect.getInstance().getString(R.string.xform_parse_error,
+                message += Collect.getInstance().getAppContext().getResources().getString(R.string.xform_parse_error,
                         fileResult.file.getName(), "submission url");
             }
         }
         if (!installed) {
-            message += Collect.getInstance().getString(R.string.copying_media_files_failed);
+            message += Collect.getInstance().getAppContext().getResources().getString(R.string.copying_media_files_failed);
             cleanUp(fileResult, null, tempMediaPath);
         }
         return message;
@@ -221,7 +221,7 @@ public class FormDownloader {
                 // this means we should delete the entire form together with the metadata
                 Uri uri = uriResult.getUri();
                 Timber.w("The form is new. We should delete the entire form.");
-                int deletedCount = Collect.getInstance().getContentResolver().delete(uri,
+                int deletedCount = Collect.getInstance().getApplicationVal().getContentResolver().delete(uri,
                         null, null);
                 Timber.w("Deleted %d rows using uri %s", deletedCount, uri.toString());
             }
@@ -465,7 +465,7 @@ public class FormDownloader {
             Timber.w("Copied %s over %s", tempFile.getAbsolutePath(), file.getAbsolutePath());
             FileUtils.deleteAndReport(tempFile);
         } else {
-            String msg = Collect.getInstance().getString(R.string.fs_file_copy_error,
+            String msg = Collect.getInstance().getAppContext().getResources().getString(R.string.fs_file_copy_error,
                     tempFile.getAbsolutePath(), file.getAbsolutePath(), errorMessage);
             Timber.w(msg);
             throw new RuntimeException(msg);
@@ -524,7 +524,7 @@ public class FormDownloader {
         }
 
         if (stateListener != null) {
-            stateListener.progressUpdate(Collect.getInstance().getString(R.string.fetching_manifest, fd.getFormName()),
+            stateListener.progressUpdate(Collect.getInstance().getAppContext().getResources().getString(R.string.fetching_manifest, fd.getFormName()),
                     String.valueOf(count), String.valueOf(total));
         }
 
@@ -536,10 +536,10 @@ public class FormDownloader {
             return result.errorMessage;
         }
 
-        String errMessage = Collect.getInstance().getString(R.string.access_error, fd.getManifestUrl());
+        String errMessage = Collect.getInstance().getAppContext().getResources().getString(R.string.access_error, fd.getManifestUrl());
 
         if (!result.isOpenRosaResponse) {
-            errMessage += Collect.getInstance().getString(R.string.manifest_server_error);
+            errMessage += Collect.getInstance().getAppContext().getResources().getString(R.string.manifest_server_error);
             Timber.e(errMessage);
             return errMessage;
         }
@@ -548,14 +548,14 @@ public class FormDownloader {
         Element manifestElement = result.doc.getRootElement();
         if (!manifestElement.getName().equals("manifest")) {
             errMessage +=
-                    Collect.getInstance().getString(R.string.root_element_error,
+                    Collect.getInstance().getAppContext().getResources().getString(R.string.root_element_error,
                             manifestElement.getName());
             Timber.e(errMessage);
             return errMessage;
         }
         String namespace = manifestElement.getNamespace();
         if (!isXformsManifestNamespacedElement(manifestElement)) {
-            errMessage += Collect.getInstance().getString(R.string.root_namespace_error, namespace);
+            errMessage += Collect.getInstance().getAppContext().getResources().getString(R.string.root_namespace_error, namespace);
             Timber.e(errMessage);
             return errMessage;
         }
@@ -611,7 +611,7 @@ public class FormDownloader {
                 }
                 if (filename == null || downloadUrl == null || hash == null) {
                     errMessage +=
-                            Collect.getInstance().getString(R.string.manifest_tag_error,
+                            Collect.getInstance().getAppContext().getResources().getString(R.string.manifest_tag_error,
                                     Integer.toString(i));
                     Timber.e(errMessage);
                     return errMessage;
@@ -634,7 +634,7 @@ public class FormDownloader {
                 ++mediaCount;
                 if (stateListener != null) {
                     stateListener.progressUpdate(
-                            Collect.getInstance().getString(R.string.form_download_progress,
+                            Collect.getInstance().getAppContext().getResources().getString(R.string.form_download_progress,
                                     fd.getFormName(),
                                     String.valueOf(mediaCount), String.valueOf(files.size())),
                             String.valueOf(count), String.valueOf(total));

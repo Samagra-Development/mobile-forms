@@ -79,7 +79,7 @@ public class MediaUtils {
         String[] projection = {Images.ImageColumns._ID};
         try (Cursor c = Collect
                 .getInstance()
-                .getContentResolver()
+                .getApplicationVal().getContentResolver()
                 .query(Images.Media.EXTERNAL_CONTENT_URI,
                         projection, selection, selectArgs, null)) {
             if (c != null && c.getCount() > 0) {
@@ -97,7 +97,7 @@ public class MediaUtils {
     }
 
     public static final int deleteImageFileFromMediaProvider(String imageFile) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr = Collect.getInstance().getApplicationVal().getContentResolver();
         // images
         int count = 0;
         Cursor imageCursor = null;
@@ -142,7 +142,7 @@ public class MediaUtils {
     }
 
     public static final int deleteImagesInFolderFromMediaProvider(File folder) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr = Collect.getInstance().getApplicationVal().getContentResolver();
         // images
         int count = 0;
         Cursor imageCursor = null;
@@ -189,7 +189,7 @@ public class MediaUtils {
         Cursor c = null;
         try {
             c = Collect
-                    .getInstance()
+                    .getInstance().getApplicationVal()
                     .getContentResolver()
                     .query(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                             projection, selection, selectArgs, null);
@@ -212,7 +212,7 @@ public class MediaUtils {
     }
 
     public static final int deleteAudioFileFromMediaProvider(String audioFile) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr = Collect.getInstance().getApplicationVal().getContentResolver();
         // audio
         int count = 0;
         Cursor audioCursor = null;
@@ -257,7 +257,7 @@ public class MediaUtils {
     }
 
     public static final int deleteAudioInFolderFromMediaProvider(File folder) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr = Collect.getInstance().getApplicationVal().getContentResolver();
         // audio
         int count = 0;
         Cursor audioCursor = null;
@@ -305,7 +305,7 @@ public class MediaUtils {
         try {
             c = Collect
                     .getInstance()
-                    .getContentResolver()
+                    .getApplicationVal().getContentResolver()
                     .query(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                             projection, selection, selectArgs, null);
             if (c.getCount() > 0) {
@@ -327,7 +327,7 @@ public class MediaUtils {
     }
 
     public static final int deleteVideoFileFromMediaProvider(String videoFile) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr = Collect.getInstance().getApplicationVal().getContentResolver();
         // video
         int count = 0;
         Cursor videoCursor = null;
@@ -372,7 +372,7 @@ public class MediaUtils {
     }
 
     public static final int deleteVideoInFolderFromMediaProvider(File folder) {
-        ContentResolver cr = Collect.getInstance().getContentResolver();
+        ContentResolver cr = Collect.getInstance().getApplicationVal().getContentResolver();
         // video
         int count = 0;
         Cursor videoCursor = null;

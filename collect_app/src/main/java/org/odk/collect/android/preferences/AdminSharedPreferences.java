@@ -28,7 +28,7 @@ public class AdminSharedPreferences {
     private final android.content.SharedPreferences sharedPreferences;
 
     private AdminSharedPreferences() {
-        sharedPreferences = Collect.getInstance().getSharedPreferences(ADMIN_PREFERENCES, 0);
+        sharedPreferences = Collect.getInstance().getAppContext().getSharedPreferences(ADMIN_PREFERENCES, 0);
     }
 
     public static synchronized AdminSharedPreferences getInstance() {

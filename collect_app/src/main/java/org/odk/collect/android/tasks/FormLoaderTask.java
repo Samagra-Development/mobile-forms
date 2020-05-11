@@ -149,7 +149,7 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
             formDef = createFormDefFromCacheOrXml(formPath, formXml);
         } catch (StackOverflowError e) {
             Timber.e(e);
-            errorMsg = Collect.getInstance().getString(R.string.too_complex_form);
+            errorMsg = Collect.getInstance().getAppContext().getResources().getString(R.string.too_complex_form);
         }
 
         if (errorMsg != null || formDef == null) {
@@ -232,7 +232,7 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
 
     private FormDef createFormDefFromCacheOrXml(String formPath, File formXml) {
         publishProgress(
-                Collect.getInstance().getString(R.string.survey_loading_reading_form_message));
+                Collect.getInstance().getAppContext().getResources().getString(R.string.survey_loading_reading_form_message));
 
         final FormDef formDefFromCache = FormDefCache.readCache(formXml);
         if (formDefFromCache != null) {
@@ -327,7 +327,7 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
                 // This order is important. Import data, then initialize.
                 try {
                     Timber.i("Importing data");
-                    publishProgress(Collect.getInstance().getString(R.string.survey_loading_reading_data_message));
+                    publishProgress(Collect.getInstance().getAppContext().getResources().getString(R.string.survey_loading_reading_data_message));
                     importData(instanceXml, fec);
                     formDef.initialize(false, instanceInit);
                 } catch (IOException | RuntimeException e) {
@@ -394,7 +394,7 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
             if (!externalDataMap.isEmpty()) {
 
                 publishProgress(Collect.getInstance()
-                        .getString(R.string.survey_loading_reading_csv_message));
+                        .getAppContext().getResources().getString(R.string.survey_loading_reading_csv_message));
 
                 ExternalDataReader externalDataReader = new ExternalDataReaderImpl(this);
                 externalDataReader.doImport(externalDataMap);
