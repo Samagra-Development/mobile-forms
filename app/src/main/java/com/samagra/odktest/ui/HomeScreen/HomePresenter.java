@@ -3,8 +3,11 @@ package com.samagra.odktest.ui.HomeScreen;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import com.samagra.ancillaryscreens.screens.splash.SplashActivity;
 import com.samagra.commons.utils.AlertDialogUtils;
 import com.samagra.commons.utils.FormDownloadStatus;
@@ -16,6 +19,8 @@ import com.samagra.odktest.base.BasePresenter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.odk.collect.android.contracts.CSVBuildStatusListener;
+import org.odk.collect.android.contracts.CSVHelper;
 import org.odk.collect.android.contracts.DataFormDownloadResultCallback;
 import org.odk.collect.android.contracts.FormListDownloadResultCallback;
 import org.odk.collect.android.contracts.IFormManagementContract;
@@ -23,6 +28,7 @@ import org.odk.collect.android.logic.FormDetails;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -66,7 +72,7 @@ public class HomePresenter<V extends HomeMvpView, I extends HomeMvpInteractor> e
     }
 
     private String getUserRoleFromPref() {
-        return "Test";
+        return "Sample";
 //        return getMvpInteractor().getPreferenceHelper().getUserRoleFromPref(); //Viewing and download of forms is based on User's role, you can configure it via Preferences when logging in as per User's Login response
     }
 
@@ -142,12 +148,49 @@ public class HomePresenter<V extends HomeMvpView, I extends HomeMvpInteractor> e
 
     public void onViewSpecificFormClicked() {
         //You should know Forms'name
-
-        getIFormManagementContract().launchSpecificDataForm(getMvpView().getActivityContext(), "All Widgets");
+         String referenceFileName = "student_list.csv";
+         ArrayList<String> mediaDirectoriesNames =  getIFormManagementContract().fetchMediaDirs(referenceFileName);
+        if (mediaDirectoriesNames.size() > 0) {
+            getIFormManagementContract().buildCSV(new CSVBuildStatusListener() {
+                @Override
+                public void onSuccess() {
+                    getMvpView().showSnackbar("Prefilling CSV done successfully. Launching the form", Snackbar.LENGTH_LONG);
+                    getIFormManagementContract().launchSpecificDataForm(getMvpView().getActivityContext(), "Test Homework");
+                }
+                @Override
+                public void onFailure(Exception exception, CSVHelper.BuildFailureType buildFailureType) {
+                    Toast.makeText(getMvpView().getActivityContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+                    getIFormManagementContract().launchSpecificDataForm(getMvpView().getActivityContext(), "Test Homework");
+                }
+            }, mediaDirectoriesNames, buildJSONArray(), referenceFileName);
+        }
 //        getIFormManagementContract().launchFormChooserView(getMvpView().getActivityContext(), UtilityFunctions.generateToolbarModificationObject(true,
 //                R.drawable.ic_arrow_back_white_24dp, "Choose Forms", true));
     }
 
+
+    private JSONArray buildJSONArray() {
+        String jsonString = "{\"status\":\"Success\",\"data\":[{\"index\":55506,\"id\":55506,\"udise\":110,\"name\":\"Sukhpr\",\"parentContact\":\"9873887425\",\"grade\":2,\"section\":\"C\",\"fatherName\":\"Shsh\",\"motherName\":\"Shsh\",\"gender\":\"Male\",\"rollNumber\":5643,\"category\":\"General\",\"isCWSN\":\"Yes\",\"admissionNumber\":5643},{\"index\":55515,\"id\":55515,\"udise\":110,\"name\":\"new tool\",\"parentContact\":\"9873887425\",\"grade\":4,\"section\":\"B\",\"fatherName\":\"ok\",\"motherName\":\"ok\",\"gender\":\"Male\",\"rollNumber\":9653,\"category\":\"General\",\"isCWSN\":\"Yes\",\"admissionNumber\":9653},{\"index\":55737,\"id\":55737,\"udise\":110,\"name\":\"Kranti \",\"parentContact\":\"9418129628\",\"grade\":5,\"section\":\"A\",\"fatherName\":\"Divya fbks\",\"motherName\":\"Divya fbks\",\"gender\":\"Male\",\"rollNumber\":1245,\"category\":\"General\",\"isCWSN\":\"Yes\",\"admissionNumber\":1245},{\"index\":183968,\"id\":183968,\"udise\":110,\"name\":\"testing\",\"parentContact\":\"9415787824\",\"grade\":3,\"section\":\"A\",\"fatherName\":\"testing\",\"motherName\":\"testing\",\"gender\":\"Male\",\"rollNumber\":999999,\"category\":\"General\",\"isCWSN\":\"Yes\",\"admissionNumber\":999999},{\"index\":232306,\"id\":232306,\"udise\":110,\"name\":\"Saurav Kaul\",\"parentContact\":\"9873887425\",\"grade\":1,\"section\":\"A\",\"fatherName\":\"Ami\",\"motherName\":\"Ami\",\"gender\":\"Male\",\"rollNumber\":4,\"category\":\"General\",\"isCWSN\":\"No\",\"admissionNumber\":4},{\"index\":232309,\"id\":232309,\"udise\":110,\"name\":\"Shashikala\",\"parentContact\":\"9873887425\",\"grade\":1,\"section\":\"A\",\"fatherName\":\"Ami\",\"motherName\":\"Ami\",\"gender\":\"Female\",\"rollNumber\":6,\"category\":\"General\",\"isCWSN\":\"Yes\",\"admissionNumber\":6},{\"index\":232307,\"id\":232307,\"udise\":110,\"name\":\"Vidhi Kapoor\",\"parentContact\":\"9873887425\",\"grade\":1,\"section\":\"A\",\"fatherName\":\"Ami\",\"motherName\":\"Ami\",\"gender\":\"Female\",\"rollNumber\":3,\"category\":\"General\",\"isCWSN\":\"Yes\",\"admissionNumber\":3},{\"index\":232308,\"id\":232308,\"udise\":110,\"name\":\"Ramkrishan Galgotia\",\"parentContact\":\"9873887425\",\"grade\":1,\"section\":\"A\",\"fatherName\":\"Ami\",\"motherName\":\"Ami\",\"gender\":\"Female\",\"rollNumber\":2,\"category\":\"General\",\"isCWSN\":\"Yes\",\"admissionNumber\":2},{\"index\":232310,\"id\":232310,\"udise\":110,\"name\":\"Gaurav Sood\",\"parentContact\":\"9873887425\",\"grade\":1,\"section\":\"A\",\"fatherName\":\"Ami\",\"motherName\":\"Ami\",\"gender\":\"Male\",\"rollNumber\":5,\"category\":\"General\",\"isCWSN\":\"Yes\",\"admissionNumber\":5},{\"index\":232305,\"id\":232305,\"udise\":110,\"name\":\"Amitabh Ghose\",\"parentContact\":\"9873887425\",\"grade\":1,\"section\":\"A\",\"fatherName\":\"Ami\",\"motherName\":\"Ami\",\"gender\":\"Male\",\"rollNumber\":1,\"category\":\"General\",\"isCWSN\":\"Yes\",\"admissionNumber\":1}]}";
+        Gson gson = new Gson();
+        Map m = gson.fromJson(jsonString, Map.class);
+        ArrayList<LinkedTreeMap> students = (ArrayList<LinkedTreeMap>) m.get("data");
+        JSONArray jsonArray = new JSONArray();
+        for(LinkedTreeMap linkedTreeMap : students){
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("student", linkedTreeMap.get("name").toString());
+                jsonObject.put("section", linkedTreeMap.get("section").toString());
+                if(linkedTreeMap.get("grade") != null){
+                    String value =linkedTreeMap.get("grade").toString().split("\\.")[0];
+                    jsonObject.put("class", "class"+value);
+                }
+                jsonArray.put(jsonObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return jsonArray;
+    }
     private boolean isUpversioned(String version, String previousVersion) {
         try {
             return Integer.parseInt(version) > Integer.parseInt(previousVersion);
@@ -164,7 +207,7 @@ public class HomePresenter<V extends HomeMvpView, I extends HomeMvpInteractor> e
             String formsString = MyApplication.getmFirebaseRemoteConfig().getString(getRoleFromRoleMappingFirebase(getUserRoleFromPref()));
             HashMap<String, String> userRoleBasedForms = getIFormManagementContract().downloadFormList(formsString);
             // Download Forms if updates available or if forms not downloaded. Delete forms if not applied for the role.
-            HashMap<String, String> formsToBeDownloaded = getIFormManagementContract().downloadNewFormsBasedOnDownloadedFormList(userRoleBasedForms, latestFormListFromServer);
+            HashMap<String, FormDetails> formsToBeDownloaded = getIFormManagementContract().downloadNewFormsBasedOnDownloadedFormList(userRoleBasedForms, latestFormListFromServer);
             if (formsToBeDownloaded.size() > 0)
                 formsDownloadStatus = FormDownloadStatus.DOWNLOADING;
             else {

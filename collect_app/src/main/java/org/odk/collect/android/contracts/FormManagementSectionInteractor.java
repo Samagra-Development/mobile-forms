@@ -81,7 +81,6 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
     public void resetPreviousODKForms() {
         final List<Integer> resetActions = new ArrayList<>();
         resetActions.add(ResetUtility.ResetAction.RESET_FORMS);
-        resetActions.add(ResetUtility.ResetAction.RESET_PREFERENCES);
         resetActions.add(ResetUtility.ResetAction.RESET_LAYERS);
         resetActions.add(ResetUtility.ResetAction.RESET_CACHE);
         resetActions.add(ResetUtility.ResetAction.RESET_OSM_DROID);
@@ -205,6 +204,7 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
         Uri formUri = ContentUris.withAppendedId(FormsProviderAPI.FormsColumns.CONTENT_URI, formToBeOpened);
         Intent intent = new Intent(Intent.ACTION_EDIT, formUri);
         intent.putExtra(ApplicationConstants.BundleKeys.FORM_MODE, ApplicationConstants.FormModes.EDIT_SAVED);
+        intent.putExtra("formTitle", formIdentifier);
         context.startActivity(intent);
     }
 
@@ -259,6 +259,16 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
                 }
             }
         }
+    }
+
+    @Override
+    public ArrayList<String> fetchMediaDirs(String referenceFileName) {
+       return CSVHelper.fetchFormMediaDirectoriesWithMedia(referenceFileName);
+    }
+
+    @Override
+    public void buildCSV(CSVBuildStatusListener csvBuildStatusListener, ArrayList<String> mediaDirectoriesNames, JSONArray inputData, String mediaFileName) {
+        CSVHelper.buildCSVForODK(csvBuildStatusListener, mediaDirectoriesNames, inputData, mediaFileName);
     }
 
     @Override
@@ -331,8 +341,10 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
     }
 
     @Override
-    public HashMap<String, String> downloadNewFormsBasedOnDownloadedFormList(HashMap<String, String> userRoleBasedForms, HashMap<String, FormDetails> latestFormListFromServer) {
+    public HashMap<String, FormDetails> downloadNewFormsBasedOnDownloadedFormList(HashMap<String, String> userRoleBasedForms, HashMap<String, FormDetails> latestFormListFromServer) {
         HashMap<String, String> formsToBeDownloaded = new HashMap<>();
+        HashMap<String, FormDetails> formsToBeDownloadedABC = new HashMap<>();
+
         List<Form>  formsFromDB = getDownloadedFormsNamesFromDatabase();
         Iterator it = latestFormListFromServer.entrySet().iterator();
 
@@ -360,43 +372,47 @@ public class FormManagementSectionInteractor implements IFormManagementContract 
                             nullTest = true;
                         if (form.getJrVersion() == null && fd.getFormVersion() != null) {
                             formsToBeDownloaded.put(fd.getFormID(), fd.getFormName());
+                            formsToBeDownloadedABC.put(fd.getFormID(), fd);
                             formsToBeDeleted.add(form.getMD5Hash());
                         } else if (!nullTest && !form.getJrVersion().equals(fd.getFormVersion())) {
                             formsToBeDownloaded.put(fd.getFormID(), fd.getFormName());
+                            formsToBeDownloadedABC.put(fd.getFormID(), fd);
                             formsToBeDeleted.add(form.getMD5Hash());
                         }
                     }
                 }
-                if (!foundFormInDB) formsToBeDownloaded.put(fd.getFormID(), fd.getFormName());
+                if (!foundFormInDB) {
+                    formsToBeDownloaded.put(fd.getFormID(), fd.getFormName());
+                    formsToBeDownloadedABC.put(fd.getFormID(), fd);
+                }
             }
         }
         if (formsToBeDeleted.size() > 0 && formsToBeDeleted.toArray() != null) {
             new FormsDao().deleteFormsFromMd5Hash(formsToBeDeleted.toArray(new String[0]));
         }
-       return formsToBeDownloaded;
+       return formsToBeDownloadedABC;
     }
 
     @Override
     public void downloadODKForms(DataFormDownloadResultCallback dataFormDownloadResultCallback,
-                                 HashMap<String, String> forms) {
+                                 HashMap<String, FormDetails> forms) {
         ArrayList<FormDetails> filesToDownload = new ArrayList<>();
         Iterator it = forms.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
-            String formName = pair.getValue().toString();
-            String formID = pair.getKey().toString();
-            String fileName = Collect.FORMS_PATH + File.separator + formName + ".xml";
+            String formID =  ((FormDetails)pair.getValue()).getFormID();
+//                String fileName = Collect.FORMS_PATH + File.separator + formName + ".xml";
             String serverURL = new WebCredentialsUtils().getServerUrlFromPreferences();
-            String partURL = "/www/formXml?formId=";
-            String downloadUrl = serverURL + partURL + formID;
+            String downloadUrl = serverURL + "/forms/" + formID + ".xml";
+            String manifestUrl = serverURL + "/forms/" + formID + "/manifest";
             FormDetails fm = new FormDetails(
-                    formName,
+                    ((FormDetails)pair.getValue()).getFormName(),
                     downloadUrl,
-                    null,
+                    manifestUrl,
                     formID,
-                    "",
-                    null,
-                    null,
+                    ((FormDetails)pair.getValue()).getFormVersion(),
+                    ((FormDetails)pair.getValue()).getHash(),
+                    ((FormDetails)pair.getValue()).getManifestFileHash(),
                     false,
                     false);
             filesToDownload.add(fm);

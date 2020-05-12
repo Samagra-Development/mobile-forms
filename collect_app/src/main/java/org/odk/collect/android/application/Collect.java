@@ -126,7 +126,7 @@ public class Collect {
     }
 
 
-    public void init(Application application, Context context, Informer informer) {
+    public void init(Application application, Context context, FormManagmentModuleInitialisationListener informer) {
         if(application != null && context != null) {
             applicationVal = application;
             appContext = context;

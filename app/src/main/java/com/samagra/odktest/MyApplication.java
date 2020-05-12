@@ -29,7 +29,7 @@ import com.samagra.odktest.di.component.DaggerApplicationComponent;
 import com.samagra.odktest.di.modules.ApplicationModule;
 
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.application.Informer;
+import org.odk.collect.android.application.FormManagmentModuleInitialisationListener;
 import org.odk.collect.android.contracts.ComponentManager;
 import org.odk.collect.android.contracts.FormManagementSectionInteractor;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
@@ -69,7 +69,7 @@ public class MyApplication extends Application implements MainApplication, Lifec
     @Override
     public void onCreate() {
         super.onCreate();
-        Collect.getInstance().init(this, getApplicationContext(), new Informer() {
+        Collect.getInstance().init(this, getApplicationContext(), new FormManagmentModuleInitialisationListener() {
             @Override
             public void onSuccess() {
                Timber.d("Form Module has been initialised correctly");

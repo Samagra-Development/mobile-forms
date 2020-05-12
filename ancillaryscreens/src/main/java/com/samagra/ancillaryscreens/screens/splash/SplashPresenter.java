@@ -85,6 +85,6 @@ public class SplashPresenter<V extends SplashContract.View, I extends SplashCont
     private void init() {
         getMvpView().showActivityLayout();
         getMvpView().showSimpleSplash();
-        getIFormManagementContract().resetEverythingODK();
+        getIFormManagementContract().resetPreviousODKForms();
     }
 }

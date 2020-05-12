@@ -43,9 +43,7 @@
   "general" : {
 
     "protocol": "odk_default",
-    "server_url": "https://agg.dummy.samagra.io/",
-    "username": "administrator",
-    "password": "rmXkTXlaeq?P3E",
+    "server_url": "https://central.dummy.samagra.io/v1/key/56$B!7D8NewOTbomVSkBmQCUSTzWpLxs7R2NilNaqIUTPCpV5S5YuBLTjn7O!1d2/projects/2",
     "navigation": "buttons",
 
     "delete_send": false,
