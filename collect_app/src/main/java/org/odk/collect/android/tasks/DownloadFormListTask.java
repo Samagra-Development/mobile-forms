@@ -15,11 +15,12 @@
 package org.odk.collect.android.tasks;
 
 import android.os.AsyncTask;
+
 import androidx.annotation.Nullable;
 
 import org.odk.collect.android.listeners.FormListDownloaderListener;
-import org.odk.collect.android.logic.FormDetails;
-import org.odk.collect.android.utilities.DownloadFormListUtils;
+import org.odk.collect.android.formmanagement.ServerFormDetails;
+import org.odk.collect.android.utilities.FormListDownloader;
 
 import java.util.HashMap;
 
@@ -31,33 +32,32 @@ import java.util.HashMap;
  *
  * @author carlhartung
  */
-public class DownloadFormListTask extends AsyncTask<Void, String, HashMap<String, FormDetails>> {
+public class DownloadFormListTask extends AsyncTask<Void, String, HashMap<String, ServerFormDetails>> {
 
-    private final DownloadFormListUtils downloadFormListUtils;
+    private final FormListDownloader formListDownloader;
 
     private FormListDownloaderListener stateListener;
     private String url;
     private String username;
     private String password;
 
-    public DownloadFormListTask(DownloadFormListUtils downloadFormListUtils) {
-        this.downloadFormListUtils = downloadFormListUtils;
+    public DownloadFormListTask(FormListDownloader formListDownloader) {
+        this.formListDownloader = formListDownloader;
     }
 
     @Override
-    protected HashMap<String, FormDetails> doInBackground(Void... values) {
-        return downloadFormListUtils.downloadFormList(url, username, password, false);
+    protected HashMap<String, ServerFormDetails> doInBackground(Void... values) {
+        return formListDownloader.downloadFormList(url, username, password);
     }
 
     @Override
-    protected void onPostExecute(HashMap<String, FormDetails> value) {
+    protected void onPostExecute(HashMap<String, ServerFormDetails> value) {
         synchronized (this) {
             if (stateListener != null) {
                 stateListener.formListDownloadingComplete(value);
             }
         }
     }
-
 
     public void setDownloaderListener(FormListDownloaderListener sl) {
         synchronized (this) {

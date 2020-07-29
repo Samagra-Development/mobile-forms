@@ -1,7 +1,6 @@
 package org.odk.collect.android.utilities;
 
 import android.content.Context;
-import android.os.Build;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -19,10 +18,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import bikramsambat.BikramSambatDate;
-import bikramsambat.BsCalendar;
-import bikramsambat.BsException;
-import bikramsambat.BsGregorianDate;
+//import bikramsambat.BikramSambatDate;
+//import bikramsambat.BsCalendar;
+//import bikramsambat.BsException;
+//import bikramsambat.BsGregorianDate;
 import mmcalendar.MyanmarDate;
 import mmcalendar.MyanmarDateConverter;
 import timber.log.Timber;
@@ -36,12 +35,8 @@ public class DateTimeUtils {
     private static String getGregorianDateTimeLabel(Date date, DatePickerDetails datePickerDetails, boolean containsTime, Locale locale) {
         DateFormat dateFormatter;
         locale = locale == null ? Locale.getDefault() : locale;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            String format = android.text.format.DateFormat.getBestDateTimePattern(locale, getDateTimeSkeleton(containsTime, datePickerDetails));
-            dateFormatter = new SimpleDateFormat(format, locale);
-        } else {
-            dateFormatter = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, locale);
-        }
+        String format = android.text.format.DateFormat.getBestDateTimePattern(locale, getDateTimeSkeleton(containsTime, datePickerDetails));
+        dateFormatter = new SimpleDateFormat(format, locale);
         return dateFormatter.format(date);
     }
 
@@ -66,10 +61,10 @@ public class DateTimeUtils {
                 customDate = new DateTime(date).withChronology(IslamicChronology.getInstance());
                 monthArray = context.getResources().getStringArray(R.array.islamic_months);
                 break;
-            case BIKRAM_SAMBAT:
-                customDate = new DateTime(date);
-                monthArray = BsCalendar.MONTH_NAMES.toArray(new String[BsCalendar.MONTH_NAMES.size()]);
-                break;
+//            case BIKRAM_SAMBAT:
+//                customDate = new DateTime(date);
+//                monthArray = BsCalendar.MONTH_NAMES.toArray(new String[BsCalendar.MONTH_NAMES.size()]);
+//                break;
             case MYANMAR:
                 customDate = new DateTime(date);
                 MyanmarDate myanmarDate = MyanmarDateConverter.convert(customDate.getYear(),
@@ -90,27 +85,27 @@ public class DateTimeUtils {
 
         SimpleDateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
         switch (datePickerDetails.getDatePickerType()) {
-            case BIKRAM_SAMBAT:
-                BikramSambatDate bikramSambatDate;
-                try {
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(date);
-                    bikramSambatDate = BsCalendar.getInstance().toBik(new BsGregorianDate(
-                            calendar.get(Calendar.YEAR),
-                            calendar.get(Calendar.MONTH) + 1,
-                            calendar.get(Calendar.DAY_OF_MONTH)));
-                    String day = datePickerDetails.isSpinnerMode() ? bikramSambatDate.day + " " : "";
-                    String month = datePickerDetails.isSpinnerMode() || datePickerDetails.isMonthYearMode() ? monthArray[bikramSambatDate.month - 1] + " " : "";
-
-                    if (containsTime) {
-                        customDateText = day + month + bikramSambatDate.year + ", " + df.format(customDate.toDate());
-                    } else {
-                        customDateText = day + month + bikramSambatDate.year;
-                    }
-                } catch (BsException e) {
-                    Timber.e(e);
-                }
-                break;
+//            case BIKRAM_SAMBAT:
+//                BikramSambatDate bikramSambatDate;
+//                try {
+//                    Calendar calendar = Calendar.getInstance();
+//                    calendar.setTime(date);
+//                    bikramSambatDate = BsCalendar.getInstance().toBik(new BsGregorianDate(
+//                            calendar.get(Calendar.YEAR),
+//                            calendar.get(Calendar.MONTH) + 1,
+//                            calendar.get(Calendar.DAY_OF_MONTH)));
+//                    String day = datePickerDetails.isSpinnerMode() ? bikramSambatDate.day + " " : "";
+//                    String month = datePickerDetails.isSpinnerMode() || datePickerDetails.isMonthYearMode() ? monthArray[bikramSambatDate.month - 1] + " " : "";
+//
+//                    if (containsTime) {
+//                        customDateText = day + month + bikramSambatDate.year + ", " + df.format(customDate.toDate());
+//                    } else {
+//                        customDateText = day + month + bikramSambatDate.year;
+//                    }
+//                } catch (BsException e) {
+//                    Timber.e(e);
+//                }
+//                break;
             case MYANMAR: {
                 MyanmarDate myanmarDate = MyanmarDateConverter.convert(customDate.getYear(),
                         customDate.getMonthOfYear(), customDate.getDayOfMonth(), customDate.getHourOfDay(),

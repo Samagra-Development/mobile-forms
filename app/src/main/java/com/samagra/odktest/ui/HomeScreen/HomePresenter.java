@@ -24,7 +24,7 @@ import org.odk.collect.android.contracts.CSVHelper;
 import org.odk.collect.android.contracts.DataFormDownloadResultCallback;
 import org.odk.collect.android.contracts.FormListDownloadResultCallback;
 import org.odk.collect.android.contracts.IFormManagementContract;
-import org.odk.collect.android.logic.FormDetails;
+import org.odk.collect.android.formmanagement.ServerFormDetails;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,6 +69,11 @@ public class HomePresenter<V extends HomeMvpView, I extends HomeMvpInteractor> e
     @Override
     public boolean currentlyDownloading() {
         return formsDownloadStatus == FormDownloadStatus.DOWNLOADING;
+    }
+
+    @Override
+    public void startStorageMigration() {
+//        getIFormManagementContract().observeStorageMigration();
     }
 
     private String getUserRoleFromPref() {
@@ -202,12 +207,12 @@ public class HomePresenter<V extends HomeMvpView, I extends HomeMvpInteractor> e
 
     class FormListDownloadListener implements FormListDownloadResultCallback {
         @Override
-        public void onSuccessfulFormListDownload(HashMap<String, FormDetails> latestFormListFromServer) {
+        public void onSuccessfulFormListDownload(HashMap<String, ServerFormDetails> latestFormListFromServer) {
             Timber.d("FormList download complete %s", latestFormListFromServer);
             String formsString = MyApplication.getmFirebaseRemoteConfig().getString(getRoleFromRoleMappingFirebase(getUserRoleFromPref()));
             HashMap<String, String> userRoleBasedForms = getIFormManagementContract().downloadFormList(formsString);
             // Download Forms if updates available or if forms not downloaded. Delete forms if not applied for the role.
-            HashMap<String, FormDetails> formsToBeDownloaded = getIFormManagementContract().downloadNewFormsBasedOnDownloadedFormList(userRoleBasedForms, latestFormListFromServer);
+            HashMap<String, ServerFormDetails> formsToBeDownloaded = getIFormManagementContract().downloadNewFormsBasedOnDownloadedFormList(userRoleBasedForms, latestFormListFromServer);
             if (formsToBeDownloaded.size() > 0)
                 formsDownloadStatus = FormDownloadStatus.DOWNLOADING;
             else {
@@ -234,7 +239,7 @@ public class HomePresenter<V extends HomeMvpView, I extends HomeMvpInteractor> e
 
     class FormDownloadListener implements DataFormDownloadResultCallback {
         @Override
-        public void formsDownloadingSuccessful(HashMap<FormDetails, String> result) {
+        public void formsDownloadingSuccessful(HashMap<ServerFormDetails, String> result) {
             Timber.d("Form Download Complete %s", result);
             formsDownloadStatus = FormDownloadStatus.SUCCESS;
             if (getMvpView() != null)

@@ -32,10 +32,11 @@ import android.widget.TextView;
 
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.form.api.FormEntryPrompt;
 import org.joda.time.LocalDateTime;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.FormEntryActivity;
+import org.odk.collect.android.formentry.questions.QuestionDetails;
+import org.odk.collect.android.formentry.questions.WidgetViewUtils;
 import org.odk.collect.android.fragments.dialogs.BikramSambatDatePickerDialog;
 import org.odk.collect.android.fragments.dialogs.CopticDatePickerDialog;
 import org.odk.collect.android.fragments.dialogs.CustomDatePickerDialog;
@@ -45,7 +46,8 @@ import org.odk.collect.android.fragments.dialogs.MyanmarDatePickerDialog;
 import org.odk.collect.android.fragments.dialogs.PersianDatePickerDialog;
 import org.odk.collect.android.logic.DatePickerDetails;
 import org.odk.collect.android.utilities.DateTimeUtils;
-import org.odk.collect.android.widgets.interfaces.BinaryWidget;
+import org.odk.collect.android.widgets.interfaces.BinaryDataReceiver;
+import org.odk.collect.android.widgets.interfaces.ButtonClickListener;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -53,6 +55,8 @@ import java.util.Date;
 
 import timber.log.Timber;
 
+import static org.odk.collect.android.formentry.questions.WidgetViewUtils.createAnswerTextView;
+import static org.odk.collect.android.formentry.questions.WidgetViewUtils.createSimpleButton;
 import static org.odk.collect.android.fragments.dialogs.CustomDatePickerDialog.DATE_PICKER_DIALOG;
 
 /**
@@ -63,9 +67,9 @@ import static org.odk.collect.android.fragments.dialogs.CustomDatePickerDialog.D
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
 @SuppressLint("ViewConstructor")
-public class DateWidget extends QuestionWidget implements DatePickerDialog.OnDateSetListener, BinaryWidget {
-    private Button dateButton;
-    private TextView dateTextView;
+public class DateWidget extends QuestionWidget implements DatePickerDialog.OnDateSetListener, BinaryDataReceiver, ButtonClickListener {
+    Button dateButton;
+    TextView dateTextView;
 
     boolean isNullAnswer;
 
@@ -73,16 +77,20 @@ public class DateWidget extends QuestionWidget implements DatePickerDialog.OnDat
 
     private DatePickerDetails datePickerDetails;
 
-    public DateWidget(Context context, FormEntryPrompt prompt) {
-        super(context, prompt);
-        createWidget();
+    public DateWidget(Context context, QuestionDetails prompt) {
+        this(context, prompt, false);
     }
 
-    protected void createWidget() {
+    public DateWidget(Context context, QuestionDetails prompt, boolean isPartOfDateTimeWidget) {
+        super(context, prompt, !isPartOfDateTimeWidget);
+        createWidget(context);
+    }
+
+    protected void createWidget(Context context) {
         datePickerDetails = DateTimeUtils.getDatePickerDetails(getFormEntryPrompt().getQuestion().getAppearanceAttr());
-        dateButton = getSimpleButton(getContext().getString(R.string.select_date));
-        dateTextView = getAnswerTextView();
-        addViews();
+        dateButton = createSimpleButton(getContext(), getFormEntryPrompt().isReadOnly(), getContext().getString(R.string.select_date), getAnswerFontSize(), this);
+        dateTextView = createAnswerTextView(getContext(), getAnswerFontSize());
+        addViews(context);
         if (getFormEntryPrompt().getAnswerValue() == null) {
             clearAnswer();
             setDateToCurrent();
@@ -147,12 +155,12 @@ public class DateWidget extends QuestionWidget implements DatePickerDialog.OnDat
         return isNullAnswer;
     }
 
-    private void addViews() {
+    private void addViews(Context context) {
         LinearLayout linearLayout = new LinearLayout(getContext());
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(dateButton);
         linearLayout.addView(dateTextView);
-        addAnswerView(linearLayout);
+        addAnswerView(linearLayout, WidgetViewUtils.getStandardMargin(context));
     }
 
     protected void setDateToCurrent() {
@@ -183,10 +191,10 @@ public class DateWidget extends QuestionWidget implements DatePickerDialog.OnDat
                 dialog = IslamicDatePickerDialog.newInstance(getFormEntryPrompt().getIndex(), date, datePickerDetails);
                 dialog.show(((FormEntryActivity) getContext()).getSupportFragmentManager(), DATE_PICKER_DIALOG);
                 break;
-            case BIKRAM_SAMBAT:
-                dialog = BikramSambatDatePickerDialog.newInstance(getFormEntryPrompt().getIndex(), date, datePickerDetails);
-                dialog.show(((FormEntryActivity) getContext()).getSupportFragmentManager(), DATE_PICKER_DIALOG);
-                break;
+//            case BIKRAM_SAMBAT:
+//                dialog = BikramSambatDatePickerDialog.newInstance(getFormEntryPrompt().getIndex(), date, datePickerDetails);
+//                dialog.show(((FormEntryActivity) getContext()).getSupportFragmentManager(), DATE_PICKER_DIALOG);
+//                break;
             case MYANMAR:
                 dialog = MyanmarDatePickerDialog.newInstance(getFormEntryPrompt().getIndex(), date, datePickerDetails);
                 dialog.show(((FormEntryActivity) getContext()).getSupportFragmentManager(), DATE_PICKER_DIALOG);
@@ -218,9 +226,7 @@ public class DateWidget extends QuestionWidget implements DatePickerDialog.OnDat
 
     private int getTheme() {
         int theme = 0;
-        // https://github.com/opendatakit/collect/issues/1424
-        // https://github.com/opendatakit/collect/issues/1367
-        if (!isBrokenSamsungDevice() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (!isBrokenSamsungDevice()) {
             theme = themeUtils.getMaterialDialogTheme();
         }
         if (!datePickerDetails.isCalendarMode() || isBrokenSamsungDevice()) {
@@ -233,7 +239,6 @@ public class DateWidget extends QuestionWidget implements DatePickerDialog.OnDat
     // https://stackoverflow.com/questions/28618405/datepicker-crashes-on-my-device-when-clicked-with-personal-app
     private boolean isBrokenSamsungDevice() {
         return Build.MANUFACTURER.equalsIgnoreCase("samsung")
-                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
                 && Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1;
     }
 

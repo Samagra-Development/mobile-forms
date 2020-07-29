@@ -15,7 +15,7 @@
 package org.odk.collect.android.upload;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -24,30 +24,27 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
-import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.samagra.commons.ExchangeObject;
-import com.samagra.commons.Modules;
-import com.samagra.commons.PushNotification;
-
-import org.odk.collect.android.ODKDriver;
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.NotificationActivity;
-import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.analytics.Analytics;
+
+import org.odk.collect.android.application.Collect1;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
-import org.odk.collect.android.dto.Form;
-import org.odk.collect.android.dto.Instance;
-import org.odk.collect.android.http.CollectThenSystemContentTypeMapper;
-import org.odk.collect.android.http.OkHttpConnection;
+import org.odk.collect.android.forms.Form;
+import org.odk.collect.android.instances.Instance;
 import org.odk.collect.android.logic.PropertyManager;
+import org.odk.collect.android.network.NetworkStateProvider;
+import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
 import org.odk.collect.android.preferences.GeneralKeys;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
+import org.odk.collect.android.storage.migration.StorageMigrationRepository;
 import org.odk.collect.android.utilities.InstanceUploaderUtils;
 import org.odk.collect.android.utilities.NotificationUtils;
 import org.odk.collect.android.utilities.PermissionUtils;
@@ -56,19 +53,32 @@ import org.odk.collect.android.utilities.gdrive.GoogleAccountsManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
+import static org.odk.collect.android.analytics.AnalyticsEvents.SUBMISSION;
 import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.AUTO_SEND;
 import static org.odk.collect.android.utilities.ApplicationConstants.RequestCodes.FORMS_UPLOADED_NOTIFICATION;
 import static org.odk.collect.android.utilities.InstanceUploaderUtils.SPREADSHEET_UPLOADED_TO_GOOGLE_DRIVE;
 
 public class AutoSendWorker extends Worker {
+
+    public static final String TAG = "AutoSendWorker";
+
     private static final int AUTO_SEND_RESULT_NOTIFICATION_ID = 1328974928;
+
+    @Inject
+    StorageMigrationRepository storageMigrationRepository;
+
+    @Inject
+    NetworkStateProvider connectivityProvider;
+
+    @Inject
+    Analytics analytics;
 
     public AutoSendWorker(@NonNull Context c, @NonNull WorkerParameters parameters) {
         super(c, parameters);
@@ -90,23 +100,26 @@ public class AutoSendWorker extends Worker {
     @Override
     @SuppressLint("WrongThread")
     public Result doWork() {
-        ConnectivityManager manager = (ConnectivityManager) getApplicationContext().getSystemService(
-                Context.CONNECTIVITY_SERVICE);
-        NetworkInfo currentNetworkInfo = manager.getActiveNetworkInfo();
+        Collect1.getInstance().getComponent().inject(this);
 
+        if (storageMigrationRepository.isMigrationBeingPerformed()) {
+            return Result.failure();
+        }
+
+        NetworkInfo currentNetworkInfo = connectivityProvider.getNetworkInfo();
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)
                 || !(networkTypeMatchesAutoSendSetting(currentNetworkInfo) || atLeastOneFormSpecifiesAutoSend())) {
             if (!networkTypeMatchesAutoSendSetting(currentNetworkInfo)) {
-                return Result.RETRY;
+                return Result.retry();
             }
 
-            return Result.FAILURE;
+            return Result.failure();
         }
 
         List<Instance> toUpload = getInstancesToAutoSend(GeneralSharedPreferences.isAutoSendEnabled());
 
         if (toUpload.isEmpty()) {
-            return Result.SUCCESS;
+            return Result.success();
         }
 
         GeneralSharedPreferences settings = GeneralSharedPreferences.getInstance();
@@ -119,22 +132,23 @@ public class AutoSendWorker extends Worker {
 
         if (protocol.equals(getApplicationContext().getString(R.string.protocol_google_sheets))) {
             if (PermissionUtils.isGetAccountsPermissionGranted(getApplicationContext())) {
-                GoogleAccountsManager accountsManager = new GoogleAccountsManager(Collect.getInstance().getAppContext());
+                GoogleAccountsManager accountsManager = new GoogleAccountsManager(Collect1.getInstance().getAppContext());
                 String googleUsername = accountsManager.getLastSelectedAccountIfValid();
                 if (googleUsername.isEmpty()) {
-                    showUploadStatusNotification(true, Collect.getInstance().getAppContext().getResources().getString(R.string.google_set_account));
-                    return Result.FAILURE;
+                    showUploadStatusNotification(true, Collect1.getInstance().getAppContext().getResources().getString(R.string.google_set_account));
+                    return Result.failure();
                 }
                 accountsManager.selectAccount(googleUsername);
                 uploader = new InstanceGoogleSheetsUploader(accountsManager);
             } else {
-                showUploadStatusNotification(true, Collect.getInstance().getAppContext().getResources().getString(R.string.odk_permissions_fail));
-                return Result.FAILURE;
+                showUploadStatusNotification(true, Collect1.getInstance().getAppContext().getResources().getString(R.string.odk_permissions_fail));
+                return Result.failure();
             }
         } else {
-            uploader = new InstanceServerUploader(new OkHttpConnection(null, new CollectThenSystemContentTypeMapper(MimeTypeMap.getSingleton())),
+            OpenRosaHttpInterface httpInterface = Collect1.getInstance().getComponent().openRosaHttpInterface();
+            uploader = new InstanceServerUploader(httpInterface,
                     new WebCredentialsUtils(), new HashMap<>());
-            deviceId = new PropertyManager(Collect.getInstance().getAppContext())
+            deviceId = new PropertyManager(Collect1.getInstance().getAppContext())
                     .getSingularProperty(PropertyManager.withUri(PropertyManager.PROPMGR_DEVICE_ID));
         }
 
@@ -149,7 +163,7 @@ public class AutoSendWorker extends Worker {
                 }
                 String customMessage = uploader.uploadOneSubmission(instance, destinationUrl);
                 resultMessagesByInstanceId.put(instance.getDatabaseId().toString(),
-                        customMessage != null ? customMessage : Collect.getInstance().getAppContext().getResources().getString(R.string.success));
+                        customMessage != null ? customMessage : Collect1.getInstance().getAppContext().getResources().getString(R.string.success));
 
                 // If the submission was successful, delete the instance if either the app-level
                 // delete preference is set or the form definition requests auto-deletion.
@@ -159,13 +173,13 @@ public class AutoSendWorker extends Worker {
                 if (InstanceUploader.formShouldBeAutoDeleted(instance.getJrFormId(),
                         (boolean) GeneralSharedPreferences.getInstance().get(GeneralKeys.KEY_DELETE_AFTER_SEND))) {
                     Uri deleteForm = Uri.withAppendedPath(InstanceColumns.CONTENT_URI, instance.getDatabaseId().toString());
-                    Collect.getInstance().getApplicationVal().getContentResolver().delete(deleteForm, null, null);
+                    Collect1.getInstance().getApplicationVal().getContentResolver().delete(deleteForm, null, null);
                 }
 
                 String action = protocol.equals(getApplicationContext().getString(R.string.protocol_google_sheets)) ?
                         "HTTP-Sheets auto" : "HTTP auto";
-                String label = Collect.getFormIdentifierHash(instance.getJrFormId(), instance.getJrVersion());
-                Collect.getInstance().logRemoteAnalytics("Submission", action, label);
+                String label = Collect1.getFormIdentifierHash(instance.getJrFormId(), instance.getJrVersion());
+                analytics.logEvent(SUBMISSION, action, label);
             } catch (UploadException e) {
                 Timber.d(e);
                 anyFailure = true;
@@ -174,10 +188,8 @@ public class AutoSendWorker extends Worker {
             }
         }
 
-        String message = formatOverallResultMessage(resultMessagesByInstanceId);
-        showUploadStatusNotification(anyFailure, message);
-
-        return Result.SUCCESS;
+        showUploadStatusNotification(anyFailure, InstanceUploaderUtils.getUploadResultMessage(getApplicationContext(), resultMessagesByInstanceId));
+        return Result.success();
     }
 
     /**
@@ -269,48 +281,19 @@ public class AutoSendWorker extends Worker {
         return false;
     }
 
-    private String formatOverallResultMessage(Map<String, String> resultMessagesByInstanceId) {
-        String message = "";
-
-        if (resultMessagesByInstanceId != null) {
-            StringBuilder selection = new StringBuilder();
-            Set<String> keys = resultMessagesByInstanceId.keySet();
-            Iterator<String> it = keys.iterator();
-
-            String[] selectionArgs = new String[keys.size()];
-            int i = 0;
-            while (it.hasNext()) {
-                String id = it.next();
-                selection.append(InstanceColumns._ID + "=?");
-                selectionArgs[i++] = id;
-                if (i != keys.size()) {
-                    selection.append(" or ");
-                }
-            }
-
-            Cursor cursor = new InstancesDao().getInstancesCursor(selection.toString(), selectionArgs);
-            message = InstanceUploaderUtils.getUploadResultMessage(cursor, resultMessagesByInstanceId);
-        }
-        return message;
-    }
-
     private void showUploadStatusNotification(boolean anyFailure, String message) {
-        Intent notifyIntent = new Intent(Collect.getInstance().getAppContext(), NotificationActivity.class);
+        Intent notifyIntent = new Intent(Collect1.getInstance().getAppContext(), NotificationActivity.class);
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        notifyIntent.putExtra(NotificationActivity.NOTIFICATION_TITLE, Collect.getInstance().getAppContext().getResources().getString(R.string.upload_results));
+        notifyIntent.putExtra(NotificationActivity.NOTIFICATION_TITLE, Collect1.getInstance().getAppContext().getResources().getString(R.string.upload_results));
         notifyIntent.putExtra(NotificationActivity.NOTIFICATION_MESSAGE, message.trim());
 
-        PendingIntent pendingNotify = PendingIntent.getActivity(Collect.getInstance().getAppContext(), FORMS_UPLOADED_NOTIFICATION,
+        PendingIntent pendingNotify = PendingIntent.getActivity(Collect1.getInstance().getAppContext(), FORMS_UPLOADED_NOTIFICATION,
                 notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        String body = anyFailure ? Collect.getInstance().getAppContext().getResources().getString(R.string.failures)
-                : Collect.getInstance().getAppContext().getResources().getString(R.string.success);
-
-        PushNotification pushNotification = new PushNotification(pendingNotify, AUTO_SEND_RESULT_NOTIFICATION_ID, R.string.odk_auto_note, body);
-        ExchangeObject exchangeObject = new ExchangeObject.NotificationExchangeObject(Modules.MAIN_APP, Modules.COLLECT_APP, pushNotification);
-        ODKDriver.applicationInstance.getEventBus().send(exchangeObject);
-
-
+        NotificationUtils.showNotification(
+                Collect1.getInstance().getAppContext(), (NotificationManager) Collect1.getInstance().getApplicationVal().getSystemService(Context.NOTIFICATION_SERVICE), R.string.odk_auto_note, anyFailure ? Collect1.getInstance().getAppContext().getResources().getString(R.string.failures)
+                        : Collect1.getInstance().getAppContext().getResources().getString(R.string.success), pendingNotify, AUTO_SEND_RESULT_NOTIFICATION_ID
+        );
 
     }
 }

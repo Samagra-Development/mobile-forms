@@ -17,16 +17,17 @@
 package org.odk.collect.android.preferences;
 
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceScreen;
-import android.view.View;
+
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
 
 import org.odk.collect.android.R;
+import org.odk.collect.android.utilities.MultiClickGuard;
 
 import java.util.Collection;
 
-import androidx.annotation.Nullable;
-
+import static org.odk.collect.android.preferences.AdminKeys.KEY_MAPS;
 import static org.odk.collect.android.preferences.PreferencesActivity.INTENT_KEY_ADMIN_MODE;
 
 public class GeneralPreferencesFragment extends BasePreferenceFragment implements Preference.OnPreferenceClickListener {
@@ -51,6 +52,7 @@ public class GeneralPreferencesFragment extends BasePreferenceFragment implement
         findPreference("maps").setOnPreferenceClickListener(this);
         findPreference("form_management").setOnPreferenceClickListener(this);
         findPreference("user_and_device_identity").setOnPreferenceClickListener(this);
+        findPreference("experimental").setOnPreferenceClickListener(this);
 
         if (!getArguments().getBoolean(INTENT_KEY_ADMIN_MODE)) {
             setPreferencesVisibility();
@@ -58,40 +60,41 @@ public class GeneralPreferencesFragment extends BasePreferenceFragment implement
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        toolbar.setTitle(R.string.general_preferences);
-    }
-
-    @Override
     public boolean onPreferenceClick(Preference preference) {
-        BasePreferenceFragment basePreferenceFragment = null;
-        boolean adminMode = getArguments().getBoolean(INTENT_KEY_ADMIN_MODE, false);
-        switch (preference.getKey()) {
-            case "protocol":
-                basePreferenceFragment = ServerPreferences.newInstance(adminMode);
-                break;
-            case "user_interface":
-                basePreferenceFragment = UserInterfacePreferences.newInstance(adminMode);
-                break;
-            case "maps":
-                basePreferenceFragment = MapsPreferences.newInstance(adminMode);
-                break;
-            case "form_management":
-                basePreferenceFragment = FormManagementPreferences.newInstance(adminMode);
-                break;
-            case "user_and_device_identity":
-                basePreferenceFragment = IdentityPreferences.newInstance(adminMode);
-                break;
+        if (MultiClickGuard.allowClick(getClass().getName())) {
+            PreferenceFragmentCompat basePreferenceFragment = null;
+            boolean adminMode = getArguments().getBoolean(INTENT_KEY_ADMIN_MODE, false);
+            switch (preference.getKey()) {
+                case "protocol":
+                    basePreferenceFragment = ServerPreferencesFragment.newInstance(adminMode);
+                    break;
+                case "user_interface":
+                    basePreferenceFragment =  new UserInterfacePreferencesFragment();
+                    break;
+                case "maps":
+                    basePreferenceFragment = MapsPreferences.newInstance(adminMode);
+                    break;
+                case "form_management":
+                    basePreferenceFragment = FormManagementPreferences.newInstance(adminMode);
+                    break;
+                case "user_and_device_identity":
+                    basePreferenceFragment = IdentityPreferences.newInstance(adminMode);
+                    break;
+                case "experimental":
+                    basePreferenceFragment = new ExperimentalPreferencesFragment();
+                    break;
+            }
+            if (basePreferenceFragment != null) {
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.preferences_fragment_container, basePreferenceFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+            return true;
         }
-        if (basePreferenceFragment != null) {
-            getActivity().getFragmentManager()
-                    .beginTransaction()
-                    .replace(android.R.id.content, basePreferenceFragment)
-                    .addToBackStack(null)
-                    .commit();
-        }
-        return true;
+
+        return false;
     }
 
     private void setPreferencesVisibility() {
@@ -104,7 +107,8 @@ public class GeneralPreferencesFragment extends BasePreferenceFragment implement
             preferenceScreen.removePreference(findPreference("user_interface"));
         }
 
-        if (!hasAtleastOneSettingEnabled(AdminKeys.mapsKeys)) {
+        boolean mapsScreenEnabled = (boolean) AdminSharedPreferences.getInstance().get(KEY_MAPS);
+        if (!mapsScreenEnabled) {
             preferenceScreen.removePreference(findPreference("maps"));
         }
 

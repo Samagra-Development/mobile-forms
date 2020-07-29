@@ -1,11 +1,12 @@
 package org.odk.collect.android.contracts;
 
-import org.odk.collect.android.logic.FormDetails;
+
+import org.odk.collect.android.formmanagement.ServerFormDetails;
 
 import java.util.HashMap;
 
 public interface DataFormDownloadResultCallback {
-    void formsDownloadingSuccessful(HashMap<FormDetails, String> result);
+    void formsDownloadingSuccessful(HashMap<ServerFormDetails, String> result);
 
     void formsDownloadingFailure();
 

@@ -1,6 +1,7 @@
 package com.samagra.odktest.ui.HomeScreen;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.PopupMenu;
@@ -10,7 +11,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.androidnetworking.AndroidNetworking;
+import com.samagra.commons.Constants;
+import com.samagra.commons.ExchangeObject;
 import com.samagra.commons.InternetMonitor;
+import com.samagra.commons.MainApplication;
+import com.samagra.commons.Modules;
 import com.samagra.odktest.R;
 import com.samagra.odktest.base.BaseActivity;
 
@@ -21,6 +27,10 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * View part of the Home Screen. This class only handles the UI operations, all the business logic is simply
@@ -52,6 +62,7 @@ public class HomeActivity extends BaseActivity implements HomeMvpView {
     @Inject
     HomePresenter<HomeMvpView, HomeMvpInteractor> homePresenter;
 
+    Disposable compositeDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +76,23 @@ public class HomeActivity extends BaseActivity implements HomeMvpView {
         InternetMonitor.startMonitoringInternet();
         initializeLayout();
         setClickListener();
+        homePresenter.startStorageMigration();
+        initialiseDisposable();
+    }
+
+    private void initialiseDisposable() {
+        compositeDisposable = ((MainApplication) (getApplicationContext()))
+                        .getEventBus()
+                        .toObservable()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(event -> {
+                            if(event != null && event instanceof ExchangeObject.DataExchangeObject){
+                                if(((ExchangeObject.DataExchangeObject) event).from == Modules.COLLECT_APP && ((ExchangeObject.DataExchangeObject) event).to == Modules.MAIN_APP ){
+                                    Log.d("evev", "vevebrvbertvbr");
+                                }
+                            }
+                        });
     }
 
     private void setClickListener() {
@@ -123,7 +151,9 @@ public class HomeActivity extends BaseActivity implements HomeMvpView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
+            compositeDisposable.dispose();
+        }
         homePresenter.onDetach();
         unbinder.unbind();
     }

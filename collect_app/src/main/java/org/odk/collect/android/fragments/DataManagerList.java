@@ -14,7 +14,7 @@
 
 package org.odk.collect.android.fragments;
 
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -29,20 +29,15 @@ import android.widget.ListView;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.InstanceListCursorAdapter;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.Collect1;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.listeners.DeleteInstancesListener;
 import org.odk.collect.android.listeners.DiskSyncListener;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.tasks.DeleteInstancesTask;
 import org.odk.collect.android.tasks.InstanceSyncTask;
-import org.odk.collect.android.tasks.sms.contracts.SmsSubmissionManagerContract;
 import org.odk.collect.android.utilities.ToastUtils;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -61,8 +56,6 @@ public class DataManagerList extends InstanceListFragment
     private AlertDialog alertDialog;
     private InstanceSyncTask instanceSyncTask;
     private ProgressDialog progressDialog;
-    @Inject
-    SmsSubmissionManagerContract smsSubmissionManager;
 
     public static DataManagerList newInstance() {
         return new DataManagerList();
@@ -78,7 +71,7 @@ public class DataManagerList extends InstanceListFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Collect.getInstance().getComponent().inject(this);
+        Collect1.getInstance().getComponent().inject(this);
     }
 
     @Override
@@ -134,8 +127,8 @@ public class DataManagerList extends InstanceListFragment
     }
 
     private void setupAdapter() {
-        String[] data = new String[]{InstanceColumns.DISPLAY_NAME, InstanceColumns.DISPLAY_SUBTEXT};
-        int[] view = new int[]{R.id.form_title, R.id.form_subtitle};
+        String[] data = {InstanceColumns.DISPLAY_NAME};
+        int[] view = {R.id.form_title};
 
         listAdapter = new InstanceListCursorAdapter(getActivity(),
                 R.layout.form_chooser_list_item_multiple_choice, null, data, view, false);
@@ -162,16 +155,11 @@ public class DataManagerList extends InstanceListFragment
         alertDialog.setMessage(getString(R.string.delete_confirm,
                 String.valueOf(getCheckedCount())));
         DialogInterface.OnClickListener dialogYesNoListener =
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        switch (i) {
-                            case DialogInterface.BUTTON_POSITIVE: // delete
-                                deleteSelectedInstances();
-                                if (getListView().getCount() == getCheckedCount()) {
-                                    toggleButton.setEnabled(false);
-                                }
-                                break;
+                (dialog, i) -> {
+                    if (i == DialogInterface.BUTTON_POSITIVE) { // delete
+                        deleteSelectedInstances();
+                        if (getListView().getCount() == getCheckedCount()) {
+                            toggleButton.setEnabled(false);
                         }
                     }
                 };
@@ -201,22 +189,12 @@ public class DataManagerList extends InstanceListFragment
             progressDialog.setCancelable(false);
             progressDialog.show();
 
-            deleteSmsSubmissions(getCheckedIdObjects());
-
             deleteInstancesTask = new DeleteInstancesTask();
             deleteInstancesTask.setContentResolver(getActivity().getContentResolver());
             deleteInstancesTask.setDeleteListener(this);
             deleteInstancesTask.execute(getCheckedIdObjects());
         } else {
             ToastUtils.showLongToast(R.string.file_delete_in_progress);
-        }
-    }
-
-    private void deleteSmsSubmissions(Long[] ids) {
-        List<Long> list = Arrays.asList(ids);
-
-        for (Long id : list) {
-            smsSubmissionManager.forgetSubmission(String.valueOf(id));
         }
     }
 
@@ -253,15 +231,15 @@ public class DataManagerList extends InstanceListFragment
 
     @Override
     public void onClick(View v) {
-        int i1 = v.getId();
-        if (i1 == R.id.delete_button) {
+        int id = v.getId();
+        if (id == R.id.delete_button) {
             int checkedItemCount = getCheckedCount();
             if (checkedItemCount > 0) {
                 createDeleteInstancesDialog();
             } else {
                 ToastUtils.showShortToast(R.string.noselect_error);
             }
-        } else if (i1 == R.id.toggle_button) {
+        } else if (id == R.id.toggle_button) {
             ListView lv = getListView();
             boolean allChecked = toggleChecked(lv);
             if (allChecked) {

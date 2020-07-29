@@ -1,9 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="MainMenuBigButton">
-        <item name="android:padding">20dp</item>
-        <item name="android:textAllCaps">false</item>
+
+    <style name="Widget.Collect.TextView.Empty" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
         <item name="android:textSize">21sp</item>
-        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="PermissionAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="Theme.MaterialComponents.Dialog.FullScreen" parent="">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">?attr/colorSurface</item>
+        <item name="toolbarNavigationButtonStyle">@style/Widget.Toolbar.Navigation.Tinted</item>
+    </style>
+
+    <style name="Widget.Toolbar.Navigation.Tinted" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="Theme.Collect.MaterialDialogSheet.Dark" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Collect.BottomSheet.Modal</item>
+        <item name="android:windowAnimationStyle">@style/MaterialDialogSheetAnimation</item>
+    </style>
+
+    <style name="Theme.Collect.MaterialDialogSheet.Light" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Collect.BottomSheet.Modal</item>
+        <item name="android:windowAnimationStyle">@style/MaterialDialogSheetAnimation</item>
+    </style>
+
+    <style name="MaterialDialogSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/popup_show</item>
+        <item name="android:windowExitAnimation">@anim/popup_hide</item>
+    </style>
+
+    <style name="Widget.Collect.BottomSheet.Modal" parent="Widget.Design.BottomSheet.Modal">
+        <item name="behavior_peekHeight">300dp</item>
     </style>
 </resources>

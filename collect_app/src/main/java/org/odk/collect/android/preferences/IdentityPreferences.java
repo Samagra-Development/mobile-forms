@@ -15,19 +15,25 @@
 package org.odk.collect.android.preferences;
 
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
-import androidx.annotation.Nullable;
-import android.view.View;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
+import androidx.fragment.app.Fragment;
+import androidx.preference.CheckBoxPreference;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.analytics.Analytics;
+
+import org.odk.collect.android.application.Collect1;
+import org.odk.collect.android.utilities.MultiClickGuard;
+
+import javax.inject.Inject;
 
 import static org.odk.collect.android.preferences.GeneralKeys.KEY_ANALYTICS;
 import static org.odk.collect.android.preferences.PreferencesActivity.INTENT_KEY_ADMIN_MODE;
 
 public class IdentityPreferences extends BasePreferenceFragment {
+
+    @Inject
+    Analytics analytics;
 
     public static IdentityPreferences newInstance(boolean adminMode) {
         Bundle bundle = new Bundle();
@@ -43,30 +49,22 @@ public class IdentityPreferences extends BasePreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.identity_preferences);
+        Collect1.getInstance().getComponent().inject(this);
 
         findPreference("form_metadata").setOnPreferenceClickListener(preference -> {
-            getActivity().getFragmentManager().beginTransaction()
-                    .replace(android.R.id.content, new FormMetadataFragment())
-                    .addToBackStack(null)
-                    .commit();
-            return true;
+            if (MultiClickGuard.allowClick(getClass().getName())) {
+                Fragment fragment = new FormMetadataFragment();
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.preferences_fragment_container, fragment)
+                        .addToBackStack(null)
+                        .commit();
+                return true;
+            }
+            return false;
         });
 
         initAnalyticsPref();
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        toolbar.setTitle(R.string.user_and_device_identity_title);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        if (toolbar != null) {
-            toolbar.setTitle(R.string.general_preferences);
-        }
     }
 
     private void initAnalyticsPref() {
@@ -74,10 +72,7 @@ public class IdentityPreferences extends BasePreferenceFragment {
 
         if (analyticsPreference != null) {
             analyticsPreference.setOnPreferenceClickListener(preference -> {
-                GoogleAnalytics googleAnalytics = GoogleAnalytics.getInstance(getActivity().getApplicationContext());
-                googleAnalytics.setAppOptOut(!analyticsPreference.isChecked());
-
-                Collect.getInstance().setAnalyticsCollectionEnabled(analyticsPreference.isChecked());
+                analytics.setAnalyticsCollectionEnabled(analyticsPreference.isChecked());
                 return true;
             });
         }

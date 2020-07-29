@@ -19,8 +19,9 @@ package org.odk.collect.android.tasks;
 import android.os.AsyncTask;
 
 import org.javarosa.core.model.FormIndex;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.logic.FormController;
+
+import org.odk.collect.android.application.Collect1;
+import org.odk.collect.android.javarosawrapper.FormController;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,10 +49,10 @@ public class SaveFormIndexTask extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         long start = System.currentTimeMillis();
 
-        FormController formController = Collect.getInstance().getFormController();
+        FormController formController = Collect1.getInstance().getFormController();
 
         try {
-            File tempFormIndexFile = SaveToDiskTask.getFormIndexFile(formController.getInstanceFile().getName());
+            File tempFormIndexFile = SaveFormToDisk.getFormIndexFile(formController.getInstanceFile().getName());
             exportFormIndexToFile(formIndex, tempFormIndexFile);
 
             long end = System.currentTimeMillis();
@@ -88,11 +89,11 @@ public class SaveFormIndexTask extends AsyncTask<Void, Void, String> {
     public static FormIndex loadFormIndexFromFile() {
         FormIndex formIndex = null;
         try {
-            String instanceName = Collect.getInstance()
+            String instanceName = Collect1.getInstance()
                     .getFormController()
                     .getInstanceFile()
                     .getName();
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(SaveToDiskTask.getFormIndexFile(instanceName)));
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(SaveFormToDisk.getFormIndexFile(instanceName)));
             formIndex = (FormIndex) ois.readObject();
             ois.close();
         } catch (Exception e) {

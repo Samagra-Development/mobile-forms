@@ -17,7 +17,6 @@
 package org.odk.collect.android.fragments;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -38,7 +37,6 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -53,8 +51,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.fragments.dialogs.ErrorDialog;
+import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.utilities.CameraUtils;
 
 import java.io.File;
@@ -69,7 +67,6 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class Camera2Fragment extends Fragment
         implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
 
@@ -400,7 +397,6 @@ public class Camera2Fragment extends Fragment
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         textureView = view.findViewById(R.id.texture);
-        textureView.setOnClickListener(this);
     }
 
     @Override
@@ -647,6 +643,8 @@ public class Camera2Fragment extends Fragment
                                 previewRequest = previewRequestBuilder.build();
                                 captureSession.setRepeatingRequest(previewRequest,
                                         captureCallback, backgroundHandler);
+
+                                getActivity().runOnUiThread(() -> textureView.setOnClickListener(Camera2Fragment.this));
                             } catch (CameraAccessException e) {
                                 Timber.e(e);
                             }
@@ -809,12 +807,10 @@ public class Camera2Fragment extends Fragment
             previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
                     CameraMetadata.CONTROL_AF_TRIGGER_CANCEL);
             setAutoFlash(previewRequestBuilder);
-            if(captureSession != null)
             captureSession.capture(previewRequestBuilder.build(), captureCallback,
                     backgroundHandler);
             // After this, the camera will go back to the normal state of preview.
             state = STATE_PREVIEW;
-            if(captureSession != null)
             captureSession.setRepeatingRequest(previewRequest, captureCallback,
                     backgroundHandler);
         } catch (CameraAccessException e) {
@@ -856,8 +852,8 @@ public class Camera2Fragment extends Fragment
             ByteBuffer buffer = image.getPlanes()[0].getBuffer();
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
-//            CameraUtils.savePhoto(new StoragePathProvider().getTmpFilePath(), bytes);
-            CameraUtils.savePhoto(Collect.TMPFILE_PATH, bytes);
+
+            CameraUtils.savePhoto(new StoragePathProvider().getTmpFilePath(), bytes);
         }
     }
 

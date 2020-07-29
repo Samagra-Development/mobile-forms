@@ -15,8 +15,10 @@
 package org.odk.collect.android.injection;
 
 import android.app.Activity;
+import android.content.Context;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.Collect1;
 import org.odk.collect.android.injection.config.AppDependencyComponent;
 
 public class DaggerUtils {
@@ -24,6 +26,10 @@ public class DaggerUtils {
     private DaggerUtils() {}
 
     public static AppDependencyComponent getComponent(Activity activity) {
-        return Collect.getInstance().getComponent();
+        return Collect1.getInstance().getComponent();
+    }
+
+    public static AppDependencyComponent getComponent(Context context) {
+        return  Collect1.getInstance().getComponent();
     }
 }

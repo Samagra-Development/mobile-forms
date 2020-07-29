@@ -16,39 +16,27 @@
 
 package org.odk.collect.android.activities;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import com.samagra.commons.Constants;
-
-import org.odk.collect.android.ODKDriver;
 import org.odk.collect.android.R;
 import org.odk.collect.android.utilities.LocaleHelper;
 import org.odk.collect.android.utilities.ThemeUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
-import timber.log.Timber;
-
+import static org.odk.collect.android.utilities.PermissionUtils.areStoragePermissionsGranted;
 import static org.odk.collect.android.utilities.PermissionUtils.finishAllActivities;
 import static org.odk.collect.android.utilities.PermissionUtils.isEntryPointActivity;
-import static org.odk.collect.android.utilities.PermissionUtils.areStoragePermissionsGranted;
 
 public abstract class CollectAbstractActivity extends AppCompatActivity {
 
     private boolean isInstanceStateSaved;
     protected ThemeUtils themeUtils;
-    private ArrayList<Integer> menuIdsToHide;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,8 +52,7 @@ public abstract class CollectAbstractActivity extends AppCompatActivity {
          * This code won't run on activities that are entry points to the app because those activities
          * are able to handle permission checks and requests by themselves.
          */
-        if (!areStoragePermissionsGranted(this) && !isEntryPointActivity(this)
-                && (getIntent().getAction() != null && !getIntent().getAction().equals("android.intent.action.MAIN"))) {
+        if (!areStoragePermissionsGranted(this) && !isEntryPointActivity(this)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog);
 
             builder.setTitle(R.string.storage_runtime_permission_denied_title)
@@ -80,37 +67,9 @@ public abstract class CollectAbstractActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (menuIdsToHide != null) {
-            for (Integer menuItemId : menuIdsToHide) {
-                MenuItem menuItem = menu.findItem(menuItemId);
-                if (menuItem != null)
-                    menuItem.setVisible(false);
-            }
-        }
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     protected void onPostResume() {
         super.onPostResume();
         isInstanceStateSaved = false;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    protected void onResume() {
-        super.onResume();
-        if (getIntent().hasExtra(Constants.KEY_CUSTOMIZE_TOOLBAR)) {
-            modifyToolbarUsingModificationMap((HashMap<String, Object>) getIntent().getSerializableExtra(Constants.KEY_CUSTOMIZE_TOOLBAR));
-        } else {
-            modifyToolbarWithGlobalDefualts();
-        }
-        if (getIntent().hasExtra(Constants.CUSTOM_TOOLBAR_ARRAYLIST_HIDE_IDS)
-                && getIntent().getIntegerArrayListExtra(Constants.CUSTOM_TOOLBAR_ARRAYLIST_HIDE_IDS) != null) {
-            menuIdsToHide = getIntent().getIntegerArrayListExtra(Constants.CUSTOM_TOOLBAR_ARRAYLIST_HIDE_IDS);
-            invalidateOptionsMenu();
-        }
     }
 
     @Override
@@ -128,55 +87,19 @@ public abstract class CollectAbstractActivity extends AppCompatActivity {
         super.attachBaseContext(new LocaleHelper().updateLocale(base));
     }
 
-    /**
-     * This function modifies the current Activity {@link Toolbar} with the parameters provided in the
-     * {@link ODKDriver}'s init function.
-     */
-    @SuppressLint("ResourceType")
-    private void modifyToolbarWithGlobalDefualts() {
-        if (getSupportActionBar() != null && ODKDriver.isModifyToolbarIcon()) {
-            if (ODKDriver.getToolbarIconResId() == Long.MAX_VALUE) {
-                // Hide the Toolbar icon
-                Timber.i("Changing toolbar Icon to null");
-                getSupportActionBar().setDisplayShowHomeEnabled(false);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            } else {
-                Timber.i("Changing toolbar icon to set Icon");
-                getSupportActionBar().setDisplayShowHomeEnabled(true);
-                getSupportActionBar().setHomeAsUpIndicator((int) ODKDriver.getToolbarIconResId());
-            }
-        } else {
-            Timber.w("No toolbar found, cannot modify");
+    @Override
+    public void applyOverrideConfiguration(Configuration overrideConfiguration) {
+        if (overrideConfiguration != null) {
+            overrideConfiguration.setTo(getBaseContext().getResources().getConfiguration());
         }
+        super.applyOverrideConfiguration(overrideConfiguration);
     }
 
-    /**
-     * This functions uses action bar preferences as provided via the intent. It is included for a more
-     * fine grained control over the ODK Collect's default activities.
-     *
-     * @param toolbarModificationObject - This is Map of Action Bar properties and their values that
-     *                                  need to be applied. This is prepared by the app module.
-     */
-    private void modifyToolbarUsingModificationMap(HashMap<String, Object> toolbarModificationObject) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            if (toolbarModificationObject.get(Constants.CUSTOM_TOOLBAR_TITLE) != null) {
-                actionBar.setTitle((String) toolbarModificationObject.get(Constants.CUSTOM_TOOLBAR_TITLE));
-            }
-            if (!(boolean) toolbarModificationObject.get(Constants.CUSTOM_TOOLBAR_SHOW_NAVICON)) {
-                actionBar.setDisplayShowHomeEnabled(false);
-                actionBar.setDisplayHomeAsUpEnabled(false);
-            } else {
-                actionBar.setDisplayShowHomeEnabled(true);
-                actionBar.setHomeAsUpIndicator((int) toolbarModificationObject.get(Constants.CUSTOM_TOOLBAR_RESID_NAVICON));
-                if ((boolean) toolbarModificationObject.get(Constants.CUSTOM_TOOLBAR_BACK_NAVICON_CLICK)) {
-                    actionBar.setDisplayHomeAsUpEnabled(true);
-                    Toolbar toolbar = findViewById(R.id.toolbar);
-                    if (toolbar != null) {
-                        toolbar.setNavigationOnClickListener(v -> finish());
-                    }
-                }
-            }
+    public void initToolbar(CharSequence title) {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle(title);
+            setSupportActionBar(toolbar);
         }
     }
 }

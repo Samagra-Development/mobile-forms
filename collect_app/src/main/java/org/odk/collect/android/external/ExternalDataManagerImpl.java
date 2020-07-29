@@ -19,7 +19,8 @@
 package org.odk.collect.android.external;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.Collect1;
 import org.odk.collect.android.exception.ExternalDataException;
 
 import java.io.File;
@@ -35,7 +36,7 @@ import timber.log.Timber;
  */
 public class ExternalDataManagerImpl implements ExternalDataManager {
 
-    private final Map<String, ExternalSQLiteOpenHelper> dbMap = new HashMap<String, ExternalSQLiteOpenHelper>();
+    private final Map<String, ExternalSQLiteOpenHelper> dbMap = new HashMap<>();
 
     private final File mediaFolder;
 
@@ -48,7 +49,7 @@ public class ExternalDataManagerImpl implements ExternalDataManager {
         ExternalSQLiteOpenHelper sqLiteOpenHelper = dbMap.get(dataSetName);
         if (sqLiteOpenHelper == null) {
             if (mediaFolder == null) {
-                String msg = Collect.getInstance().getAppContext().getResources().getString(R.string.ext_not_initialized_error);
+                String msg = Collect1.getInstance().getAppContext().getResources().getString(R.string.ext_not_initialized_error);
                 Timber.e(msg);
                 if (required) {
                     throw new ExternalDataException(msg);

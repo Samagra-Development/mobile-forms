@@ -20,8 +20,8 @@
 
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="primaryTextColor">@color/primary_text</item>
-        <item name="secondaryTextColor">@color/secondary_text</item>
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:textColorSecondary">@color/secondary_text</item>
         <item name="android:scrollbarThumbHorizontal">@drawable/thumb</item>
         <item name="android:scrollbarThumbVertical">@drawable/thumb</item>
         <item name="android:scrollbarSize">1.75mm</item>
@@ -30,13 +30,11 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fontFamily">@string/font_family_regular</item>
         <item name="android:panelBackground">@android:color/white</item>
-        <item name="alertDialogTheme">@style/AlertDialogTheme.Light</item>
-        <item name="searchViewStyle">@style/SearchViewTheme.Light</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="searchViewStyle">@style/Widget.Collect.SearchView.Light</item>
         <item name="iconColor">@color/icons</item>
         <item name="dividerColor">@color/divider</item>
-        <item name="rankItemColor">@color/lightRankItemColor</item>
         <item name="android:textDirection" tools:targetApi="17">locale</item>
-        <item name="warningColor">@color/red_500</item>
         <item name="dividerCompat">@android:drawable/divider_horizontal_bright</item>
         <item name="android:tintMode" tools:targetApi="21">src_in</item>
     </style>
@@ -48,7 +46,7 @@
     </style>
 
     <style name="BaseAppTheme.SettingsTheme.Dark" parent="BaseAppTheme">
-        <item name="android:textColor">?primaryTextColor</item>
+        <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:textDirection" tools:targetApi="17">locale</item>
         <item name="android:textSize">18sp</item>
         <item name="android:listDivider">@null</item>

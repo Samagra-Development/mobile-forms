@@ -17,43 +17,46 @@
 package org.odk.collect.android.activities;
 
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import androidx.core.view.MenuItemCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CursorAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.SortDialogAdapter;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.Collect1;
 import org.odk.collect.android.listeners.RecyclerViewClickListener;
-import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.utilities.SnackbarUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
 import static org.odk.collect.android.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
 
 abstract class AppListActivity extends CollectAbstractActivity {
+
     protected static final int LOADER_ID = 0x01;
     private static final String SELECTED_INSTANCES = "selectedInstances";
     private static final String IS_SEARCH_BOX_SHOWN = "isSearchBoxShown";
@@ -128,11 +131,9 @@ abstract class AppListActivity extends CollectAbstractActivity {
         progressBar = findViewById(R.id.progressBar);
         llParent = findViewById(R.id.llParent);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Use the nicer-looking drawable with Material Design insets.
-            listView.setDivider(getResources().getDrawable(R.drawable.list_item_divider, getTheme()));
-            listView.setDividerHeight(1);
-        }
+        // Use the nicer-looking drawable with Material Design insets.
+        listView.setDivider(getResources().getDrawable(R.drawable.list_item_divider, getTheme()));
+        listView.setDividerHeight(1);
 
         setSupportActionBar(findViewById(R.id.toolbar));
     }
@@ -174,10 +175,11 @@ abstract class AppListActivity extends CollectAbstractActivity {
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.list_menu, menu);
-
         final MenuItem sortItem = menu.findItem(R.id.menu_sort);
         final MenuItem searchItem = menu.findItem(R.id.menu_filter);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        EditText searchEditText = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(themeUtils.getColorOnPrimary());
         searchView.setQueryHint(getResources().getString(R.string.search));
         searchView.setMaxWidth(Integer.MAX_VALUE);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -225,16 +227,8 @@ abstract class AppListActivity extends CollectAbstractActivity {
             isBottomDialogShown = true;
             return true;
         }
+
         return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_sort).setVisible(false).setEnabled(false);
-        menu.findItem(R.id.menu_filter).setVisible(false).setEnabled(false);
-        return true;
     }
 
     private void performSelectedSearch(int position) {
@@ -249,7 +243,7 @@ abstract class AppListActivity extends CollectAbstractActivity {
         Cursor cursor = listAdapter.getCursor();
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                long instanceId = cursor.getLong(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
+                long instanceId = cursor.getLong(cursor.getColumnIndex(InstanceColumns._ID));
                 if (selectedInstances.contains(instanceId)) {
                     selectedPositions.add(listViewPosition);
                 }
@@ -276,7 +270,7 @@ abstract class AppListActivity extends CollectAbstractActivity {
 
     private void saveSelectedSortingOrder(int selectedStringOrder) {
         selectedSortingOrder = selectedStringOrder;
-        PreferenceManager.getDefaultSharedPreferences(Collect.getInstance().getAppContext())
+        PreferenceManager.getDefaultSharedPreferences(Collect1.getInstance().getAppContext())
                 .edit()
                 .putInt(getSortingOrderKey(), selectedStringOrder)
                 .apply();
@@ -284,7 +278,7 @@ abstract class AppListActivity extends CollectAbstractActivity {
 
     protected void restoreSelectedSortingOrder() {
         selectedSortingOrder = PreferenceManager
-                .getDefaultSharedPreferences(Collect.getInstance().getAppContext())
+                .getDefaultSharedPreferences(Collect1.getInstance().getAppContext())
                 .getInt(getSortingOrderKey(), BY_NAME_ASC);
     }
 

@@ -17,8 +17,9 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.samagra.commons.R;
-import com.samagra.commons.utils.AlertDialogUtils;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.utilities.AlertDialogUtils;
 
 import java.util.List;
 

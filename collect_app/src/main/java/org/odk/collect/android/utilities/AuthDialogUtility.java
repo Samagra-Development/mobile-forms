@@ -16,7 +16,7 @@
 
 package org.odk.collect.android.utilities;
 
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
@@ -24,7 +24,8 @@ import android.view.View;
 import android.widget.EditText;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.application.Collect1;
+
 
 import javax.inject.Inject;
 
@@ -42,7 +43,7 @@ public class AuthDialogUtility {
     @Inject WebCredentialsUtils webCredentialsUtils;
 
     public AuthDialogUtility() {
-        Collect.getInstance().getComponent().inject(this);
+        Collect1.getInstance().getComponent().inject(this);
     }
 
     public AlertDialog createDialog(final Context context,

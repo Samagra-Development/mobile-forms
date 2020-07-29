@@ -18,7 +18,8 @@ package org.odk.collect.android.utilities;
 
 import android.util.DisplayMetrics;
 
-import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.application.Collect1;
+
 
 public class ScreenUtils {
 
@@ -34,6 +35,6 @@ public class ScreenUtils {
     }
 
     private static DisplayMetrics getDisplayMetrics() {
-        return Collect.getInstance().getAppContext().getResources().getDisplayMetrics();
+        return Collect1.getInstance().getAppContext().getResources().getDisplayMetrics();
     }
 }

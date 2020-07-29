@@ -1,1 +1,1 @@
-include ':app', ':collect_app', ':commons', ':ancillaryscreens', ':customworkmanager'
+include ':nbi-stubs', ':app', ':collect_app', ':commons', ':ancillaryscreens'

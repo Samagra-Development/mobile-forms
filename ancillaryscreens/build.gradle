@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
@@ -8,7 +9,7 @@ android {
 
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -48,7 +49,8 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-compiler:2.19"
 
     //Butterknife annotation processor cannot be shared across modules
-    annotationProcessor "com.jakewharton:butterknife-compiler:10.1.0"
+    implementation 'com.jakewharton:butterknife:10.2.1'
+    annotationProcessor "com.jakewharton:butterknife-compiler:10.2.1"
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
     // dependencies for local unit testing

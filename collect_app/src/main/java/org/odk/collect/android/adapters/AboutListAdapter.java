@@ -16,10 +16,6 @@ package org.odk.collect.android.adapters;
 
 import android.content.Context;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.os.Build;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,9 +45,10 @@ public class AboutListAdapter extends RecyclerView.Adapter<AboutListAdapter.View
 
     @Override
     public void onBindViewHolder(AboutListAdapter.ViewHolder holder, int position) {
-        holder.imageView.setImageResource(items[position][0]);
+        int iconId = items[position][0];
+        holder.imageView.setImageResource(iconId);
+        holder.imageView.setTag(iconId);
         holder.title.setText(context.getString(items[position][1]));
-        String text = "";
         holder.setSummary(items[position][2]);
     }
 

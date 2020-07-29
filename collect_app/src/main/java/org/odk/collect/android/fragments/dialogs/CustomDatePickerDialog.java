@@ -30,9 +30,10 @@ import org.javarosa.core.model.FormIndex;
 import org.joda.time.LocalDateTime;
 import org.joda.time.chrono.GregorianChronology;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.Collect1;
 import org.odk.collect.android.logic.DatePickerDetails;
-import org.odk.collect.android.logic.FormController;
+import org.odk.collect.android.javarosawrapper.FormController;
 import org.odk.collect.android.utilities.DateTimeUtils;
 
 /**
@@ -93,7 +94,7 @@ public abstract class CustomDatePickerDialog extends DialogFragment {
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        FormController formController = Collect.getInstance().getFormController();
+                        FormController formController = Collect1.getInstance().getFormController();
                         if (formController != null) {
                             formController.setIndexWaitingForData(formIndex);
                         }

@@ -1,22 +1,18 @@
 {
   "admin" : {
-
     "admin_password": false,
-    "admin_pw": false,
-
+    "admin_pw": "",
     "edit_saved": false,
     "send_finalized": true,
     "view_sent": true,
     "get_blank": true,
     "delete_saved": true,
-
     "save_mid": false,
     "jump_to": true,
     "change_language": false,
     "access_settings": true,
     "save_as": false,
     "mark_as_finalized": true,
-
     "change_autosend": true,
     "change_navigation": false,
     "change_constraint_behavior": false,
@@ -32,31 +28,22 @@
     "show_map_basemap": false,
     "analytics" : false,
     "change_form_metadata": true,
-    "change_server": false,
-
     "import_settings": false,
     "change_server": false,
     "change_protocol_settings": false
-
   },
-
   "general" : {
-
     "protocol": "odk_default",
     "server_url": "https://central.dummy.samagra.io/v1/key/56$B!7D8NewOTbomVSkBmQCUSTzWpLxs7R2NilNaqIUTPCpV5S5YuBLTjn7O!1d2/projects/2",
     "navigation": "buttons",
-
     "delete_send": false,
     "autosend": "on",
     "autosend_wifi": true,
     "autosend_network": true,
-
     "constraint_behavior": "on_swipe",
     "default_to_finalized": true,
     "high_resolution": false,
     "image_size": "very_small",
-
     "instance_sync": true
   }
-
 }

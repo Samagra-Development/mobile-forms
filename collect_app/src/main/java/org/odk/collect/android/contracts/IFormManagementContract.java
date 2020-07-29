@@ -1,11 +1,11 @@
 package org.odk.collect.android.contracts;
 
+import android.app.Activity;
 import android.content.Context;
 
-import com.samagra.commons.MainApplication;
 
 import org.json.JSONArray;
-import org.odk.collect.android.logic.FormDetails;
+import org.odk.collect.android.formmanagement.ServerFormDetails;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +22,8 @@ public interface IFormManagementContract {
      * @param customThemeId_Settings- Custom Theme Id for Settings
      * @param toolbarIconResId- Toolbar Icon Resource Id
      */
-    void setODKModuleStyle(MainApplication mainApplication, int splashScreenDrawableID, int baseAppThemeStyleID,
-                           int formActivityThemeID, int customThemeId_Settings, long toolbarIconResId);
+//    void setODKModuleStyle(MainApplication mainApplication, int splashScreenDrawableID, int baseAppThemeStyleID,
+//                           int formActivityThemeID, int customThemeId_Settings, long toolbarIconResId);
 
     /**
      * This method resets  a) Saved forms (instances folder, instances database); b) Blank forms (forms folder, forms database, itemsets database);
@@ -67,14 +67,14 @@ public interface IFormManagementContract {
      * @param latestFormListFromServer - Response received from Form List Download Network Call
      * @return HashMap<String, FormDetails> Hash map with keys corresponding to the Form ID and Value being Form Details for the forms specific to the user.
      */
-    HashMap<String, FormDetails> downloadNewFormsBasedOnDownloadedFormList(HashMap<String, String> userRoleBasedForms, HashMap<String, FormDetails> latestFormListFromServer);
+    HashMap<String, ServerFormDetails> downloadNewFormsBasedOnDownloadedFormList(HashMap<String, String> userRoleBasedForms, HashMap<String, ServerFormDetails> latestFormListFromServer);
 
     /**
      * This method triggers download of specific ODK Forms for the user,
      * @param dataFormDownloadResultCallback Callback for the download process result.
      * @param formsToBeDownloaded HashMap<String, FormDetails> Hash map with keys corresponding to the Form ID and Value being Form Details for the forms specific to the user.
      */
-    void downloadODKForms(DataFormDownloadResultCallback dataFormDownloadResultCallback, HashMap<String, FormDetails> formsToBeDownloaded);
+    void downloadODKForms(DataFormDownloadResultCallback dataFormDownloadResultCallback, HashMap<String, ServerFormDetails> formsToBeDownloaded);
 
     /**
      *
@@ -164,4 +164,7 @@ public interface IFormManagementContract {
      */
     void buildCSV(CSVBuildStatusListener csvBuildStatusListener, ArrayList<String> mediaDirectoriesNames, JSONArray inputData, String mediaFileName);
 
-    }
+    void observeStorageMigration(Context context);
+
+    boolean isScopedStorageUsed();
+}

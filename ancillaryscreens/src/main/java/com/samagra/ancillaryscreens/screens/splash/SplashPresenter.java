@@ -70,11 +70,7 @@ public class SplashPresenter<V extends SplashContract.View, I extends SplashCont
      */
     @Override
     public void moveToNextScreen() {
-        getIFormManagementContract().resetODKForms(getMvpView().getActivityContext());
-        Timber.e("Moving to Home");
-        Intent intent = new Intent(Constants.INTENT_LAUNCH_HOME_ACTIVITY);
-        ExchangeObject.SignalExchangeObject signalExchangeObject = new ExchangeObject.SignalExchangeObject(Modules.MAIN_APP, Modules.ANCILLARY_SCREENS, intent, true);
-        AncillaryScreensDriver.mainApplication.getEventBus().send(signalExchangeObject);
+
 
     }
 

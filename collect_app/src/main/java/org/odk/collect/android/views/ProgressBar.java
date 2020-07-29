@@ -18,12 +18,11 @@ import butterknife.ButterKnife;
 public class ProgressBar extends FrameLayout {
 
     private static final int DURATION_MILLIS = 1000;
-    @BindView(R2.id.progress_view)
-    View progressBar;
-    @BindView(R2.id.divider)
+
     View divider;
-    @BindView(R2.id.main_layout)
     FrameLayout mainLayout;
+
+    View progressBar;
 
     public ProgressBar(Context context) {
         this(context, null);
@@ -44,6 +43,9 @@ public class ProgressBar extends FrameLayout {
     private void init() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.progress_bar_view, this, true);
         ButterKnife.bind(this, view);
+        progressBar = view.findViewById(R.id.progress_view);
+        divider = view.findViewById(R.id.divider);
+        mainLayout = view.findViewById(R.id.main_layout);
     }
 
     public void setProgressPercent(int progress, boolean animate) {

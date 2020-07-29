@@ -38,11 +38,6 @@
         <item name="behavior_peekHeight">300dp</item>
     </style>
 
-    <style name="MaterialDialogSheetAnimation">
-        <item name="android:windowEnterAnimation">@anim/popup_show</item>
-        <item name="android:windowExitAnimation">@anim/popup_hide</item>
-    </style>
-
     <style name="MediaButtonStyle">
         <item name="android:background">#ddd</item>
         <item name="android:paddingBottom">5dp</item>
@@ -56,11 +51,12 @@
     </style>
 
     <style name="ListItemPrimaryTextStyle" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="android:textColor">?primaryTextColor</item>
+        <item name="android:textColor">@color/primaryColor</item>
     </style>
 
     <style name="ListItemSecondaryTextStyle" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="android:textColor">?secondaryTextColor</item>
+        <item name="android:textColor">@color/primaryColor</item>
     </style>
 
+    <color name="primaryColor">#8cc640</color>
 </resources>

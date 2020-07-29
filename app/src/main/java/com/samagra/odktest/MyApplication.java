@@ -28,7 +28,9 @@ import com.samagra.odktest.di.component.ApplicationComponent;
 import com.samagra.odktest.di.component.DaggerApplicationComponent;
 import com.samagra.odktest.di.modules.ApplicationModule;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.ODKDriver;
+import org.odk.collect.android.application.Collect1;
 import org.odk.collect.android.application.FormManagmentModuleInitialisationListener;
 import org.odk.collect.android.contracts.ComponentManager;
 import org.odk.collect.android.contracts.FormManagementSectionInteractor;
@@ -69,10 +71,11 @@ public class MyApplication extends Application implements MainApplication, Lifec
     @Override
     public void onCreate() {
         super.onCreate();
-        Collect.getInstance().init(this, getApplicationContext(), new FormManagmentModuleInitialisationListener() {
+        Collect1.getInstance().init(this, getApplicationContext(), new FormManagmentModuleInitialisationListener() {
             @Override
             public void onSuccess() {
                Timber.d("Form Module has been initialised correctly");
+                kl();
             }
 
             @Override
@@ -80,7 +83,7 @@ public class MyApplication extends Application implements MainApplication, Lifec
                 Timber.d("Form Module could not be initialised correctly");
                 AlertDialogUtils.createErrorDialog(getApplicationContext(), "Could not start app as Form Module couldn't be initialised properly.", true);
             }
-        });
+        }, this);
         eventBus = new RxBus();
         setupRemoteConfig();
         setupActivityLifecycleListeners();
@@ -90,11 +93,14 @@ public class MyApplication extends Application implements MainApplication, Lifec
         initBus();
     }
 
+    private void kl() {
+        Collect1.getInstance().init(this, R.drawable.login_bg, R.style.BaseAppTheme,
+                R.style.FormEntryActivityTheme, R.style.BaseAppTheme_SettingsTheme_Dark, Long.MAX_VALUE);
+    }
+
     private void initializeFormManagementPackage() {
         ComponentManager.registerFormManagementPackage(new FormManagementSectionInteractor());
         FormManagementCommunicator.setContract(ComponentManager.iFormManagementContract);
-        ComponentManager.iFormManagementContract.setODKModuleStyle(this, R.drawable.login_bg, R.style.BaseAppTheme,
-                R.style.FormEntryActivityTheme, R.style.BaseAppTheme_SettingsTheme_Dark, Long.MAX_VALUE);
     }
 
     private void initBus() {
@@ -239,11 +245,11 @@ public class MyApplication extends Application implements MainApplication, Lifec
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Collect.defaultSysLanguage = newConfig.locale.getLanguage();
-        boolean isUsingSysLanguage = GeneralSharedPreferences.getInstance().get(KEY_APP_LANGUAGE).equals("");
-        if (!isUsingSysLanguage) {
-            new LocaleHelper().updateLocale(this);
-        }
+//        Collect1.defaultSysLanguage = newConfig.locale.getLanguage();
+//        boolean isUsingSysLanguage = GeneralSharedPreferences.getInstance().get(KEY_APP_LANGUAGE).equals("");
+//        if (!isUsingSysLanguage) {
+//            new LocaleHelper().updateLocale(this);
+//        }
     }
     public static FirebaseRemoteConfig getmFirebaseRemoteConfig() {
         return mFirebaseRemoteConfig;

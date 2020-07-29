@@ -21,9 +21,10 @@ package org.odk.collect.android.tasks;
 import android.os.AsyncTask;
 
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.Collect1;
 import org.odk.collect.android.listeners.SavePointListener;
-import org.odk.collect.android.logic.FormController;
+import org.odk.collect.android.javarosawrapper.FormController;
 
 import java.io.File;
 
@@ -58,8 +59,8 @@ public class SavePointTask extends AsyncTask<Void, Void, String> {
             long start = System.currentTimeMillis();
 
             try {
-                FormController formController = Collect.getInstance().getFormController();
-                File temp = SaveToDiskTask.getSavepointFile(formController.getInstanceFile().getName());
+                FormController formController = Collect1.getInstance().getFormController();
+                File temp = SaveFormToDisk.getSavepointFile(formController.getInstanceFile().getName());
                 ByteArrayPayload payload = formController.getFilledInFormXml();
 
                 if (priority < lastPriorityUsed) {
@@ -68,7 +69,7 @@ public class SavePointTask extends AsyncTask<Void, Void, String> {
                 }
 
                 // write out xml
-                SaveToDiskTask.writeFile(payload, temp.getAbsolutePath());
+                SaveFormToDisk.writeFile(payload, temp.getAbsolutePath());
 
                 long end = System.currentTimeMillis();
                 Timber.i("Savepoint ms: %s to %s", Long.toString(end - start), temp.toString());

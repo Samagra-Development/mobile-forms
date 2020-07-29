@@ -1,6 +1,5 @@
 package org.odk.collect.android.contracts;
 
-import com.samagra.commons.MainApplication;
 
 public class ComponentManager {
     public static IFormManagementContract iFormManagementContract;

@@ -25,7 +25,8 @@ import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.Collect1;
 import org.odk.collect.android.exception.ExternalDataException;
 import org.odk.collect.android.external.ExternalDataManager;
 import org.odk.collect.android.external.ExternalDataUtil;
@@ -99,7 +100,7 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
             // we should never get here since it is already handled in ExternalDataUtil
             // .getSearchXPathExpression(String appearance)
             throw new ExternalDataException(
-                    Collect.getInstance().getAppContext().getResources().getString(R.string.ext_search_wrong_arguments_error));
+                    Collect1.getInstance().getAppContext().getResources().getString(R.string.ext_search_wrong_arguments_error));
         }
 
         String searchType = null;
@@ -145,7 +146,7 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
                     ExternalDataUtil.createMapWithDisplayingColumns(getValueColumn(),
                             getDisplayColumns());
 
-            List<String> columnsToFetch = new ArrayList<String>(selectColumnMap.keySet());
+            List<String> columnsToFetch = new ArrayList<>(selectColumnMap.keySet());
             String safeImageColumn = null;
             if (getImageColumn() != null && getImageColumn().trim().length() > 0) {
                 safeImageColumn = ExternalDataUtil.toSafeColumnName(getImageColumn());
@@ -181,7 +182,7 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
                 c = db.query(ExternalDataUtil.EXTERNAL_DATA_TABLE_NAME, sqlColumns, selection,
                         selectionArgs, null, null, ExternalDataUtil.SORT_COLUMN_NAME);
             } catch (Exception e) {
-                Timber.e(Collect.getInstance().getAppContext().getResources().getString(R.string.ext_import_csv_missing_error, dataSetName, dataSetName));
+                Timber.e(Collect1.getInstance().getAppContext().getResources().getString(R.string.ext_import_csv_missing_error, dataSetName, dataSetName));
                 c = db.query(ExternalDataUtil.EXTERNAL_DATA_TABLE_NAME, sqlColumns, selection,
                         selectionArgs, null, null, null);
             }
@@ -196,16 +197,16 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
 
     protected ArrayList<SelectChoice> createDynamicSelectChoices(Cursor c,
             LinkedHashMap<String, String> selectColumnMap, String safeImageColumn) {
-        List<String> columnsToExcludeFromLabels = new ArrayList<String>();
+        List<String> columnsToExcludeFromLabels = new ArrayList<>();
         if (safeImageColumn != null) {
             columnsToExcludeFromLabels.add(safeImageColumn);
         }
 
-        ArrayList<SelectChoice> selectChoices = new ArrayList<SelectChoice>();
+        ArrayList<SelectChoice> selectChoices = new ArrayList<>();
         if (c.getCount() > 0) {
             c.moveToPosition(-1);
             int index = 0;
-            Set<String> uniqueValues = new HashSet<String>();
+            Set<String> uniqueValues = new HashSet<>();
             while (c.moveToNext()) {
 
                 // the value is always the first column

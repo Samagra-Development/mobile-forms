@@ -24,4 +24,6 @@ public interface HomeMvpPresenter<V extends HomeMvpView, I extends HomeMvpIntera
     boolean isNetworkConnected();
 
     boolean currentlyDownloading();
+
+    void startStorageMigration();
 }

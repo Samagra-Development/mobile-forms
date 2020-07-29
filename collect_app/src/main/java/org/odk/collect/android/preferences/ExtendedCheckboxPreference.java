@@ -21,9 +21,7 @@ public class ExtendedCheckboxPreference extends CheckBoxPreference {
 
     private Boolean shouldDisableDependents;
 
-    @BindView(android.R.id.title)
     TextView title;
-    @BindView(android.R.id.checkbox)
     CheckBox checkBox;
 
     public ExtendedCheckboxPreference(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -43,7 +41,8 @@ public class ExtendedCheckboxPreference extends CheckBoxPreference {
         super.onBindView(view);
 
         ButterKnife.bind(this, view);
-
+        title  = view.findViewById(android.R.id.title);
+        checkBox = view.findViewById(android.R.id.checkbox);
         //the title's color is only modified if the checkbox is disabled which means the parent
         //Server setting was disabled since shouldDisableDependents gets set in multiple places.
         if (!checkBox.isEnabled()) {

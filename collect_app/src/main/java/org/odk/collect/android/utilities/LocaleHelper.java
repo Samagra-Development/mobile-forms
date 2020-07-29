@@ -7,7 +7,8 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 
-import org.odk.collect.android.application.Collect;
+
+import org.odk.collect.android.application.Collect1;
 import org.odk.collect.android.preferences.GeneralKeys;
 
 import java.util.Locale;
@@ -42,7 +43,7 @@ public class LocaleHelper {
                 .getString(GeneralKeys.KEY_APP_LANGUAGE, "");
         boolean isUsingSysLanguage = localeCode.equals("");
         if (isUsingSysLanguage) {
-            localeCode = Collect.defaultSysLanguage;
+            localeCode = Collect1.defaultSysLanguage;
         }
         return localeCode;
     }
@@ -68,9 +69,7 @@ public class LocaleHelper {
 
         Configuration configuration = resources.getConfiguration();
         configuration.locale = locale;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            configuration.setLayoutDirection(locale);
-        }
+        configuration.setLayoutDirection(locale);
 
         resources.updateConfiguration(configuration, resources.getDisplayMetrics());
 

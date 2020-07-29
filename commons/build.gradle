@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
@@ -6,7 +7,7 @@ android {
 
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -39,10 +40,6 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    api (project(":customworkmanager")) {
-        exclude group: 'com.google.guava', module: 'listenablefuture'
-    }
-
     api 'androidx.constraintlayout:constraintlayout:1.1.3'
     api 'androidx.appcompat:appcompat:1.1.0-rc01'
     api "com.google.android.material:material:1.1.0-alpha08"
@@ -66,17 +63,9 @@ dependencies {
     api "com.google.dagger:dagger:2.19"
     api 'javax.inject:javax.inject:1'
     implementation "com.karumi:dexter:5.0.0"
-
-
     // Butterknife
-    api "com.jakewharton:butterknife:10.1.0"
-
-    implementation 'com.google.firebase:firebase-analytics:17.2.0'
-    implementation 'com.google.firebase:firebase-messaging:20.0.0'
-    implementation 'com.google.firebase:firebase-database:19.1.0'
-    implementation "com.google.firebase:firebase-auth:19.1.0"
-    implementation "com.google.firebase:firebase-storage:19.1.0"
-    implementation 'com.google.firebase:firebase-config:19.0.2'
+    implementation 'com.jakewharton:butterknife:10.2.1'
+    annotationProcessor "com.jakewharton:butterknife-compiler:10.2.1"
     //Timber
     api "com.jakewharton.timber:timber:4.7.1"
 
@@ -88,4 +77,11 @@ dependencies {
     //Android architecture components - Lifecycle
     api "androidx.lifecycle:lifecycle-runtime:2.0.0"
     api "androidx.lifecycle:lifecycle-extensions:2.0.0"
+    implementation "androidx.core:core-ktx:+"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+    mavenCentral()
 }
